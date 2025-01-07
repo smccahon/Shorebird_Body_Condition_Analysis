@@ -2,6 +2,7 @@
 output/
 processed_data/
 raw_data/
+top_model_plots/
 .Rhistory
 *.docx
 *.jpg
