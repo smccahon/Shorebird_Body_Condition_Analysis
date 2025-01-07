@@ -1,0 +1,204 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs sex-specific size-corrected body mass analysis. 
+
+Date Created: 2024-12-09
+Date Modified: 2024-12-09
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 54)
+
+-------------------------------
+
+Body size metrics: bill length (culmen), wing length, and tarsus
+
+PCA Females: 
+
+Importance of components:
+                          PC1    PC2    PC3
+Standard deviation     1.3183 0.9171 0.6488
+Proportion of Variance 0.5794 0.2804 0.1403
+Cumulative Proportion  0.5794 0.8597 1.0000
+
+PCA Males:
+
+Importance of components:
+                          PC1    PC2    PC3
+Standard deviation     1.2217 0.9724 0.7495
+Proportion of Variance 0.4975 0.3152 0.1873
+Cumulative Proportion  0.4975 0.8127 1.0000
+
+**Regressed PC1 against body mass and used the residuals as size-corrected body index values
+
+-------------------------------
+
+Univariate analyses: 
+
+*Date into season performed the best
+*Event + Time (no interaction) performed the best
+*Linear, continuous variable of agricultural intensity performed the best
+
+Interactions included: none
+
+-------------------------------
+
+## Single Models ####
+
+m.global <- lm(sc.mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+               data = leye.cs)
+
+m.null <- lm(sc.mass ~ 1, data = leye.cs)
+
+m1 <- lm(sc.mass ~ Sex, data = leye.cs)
+m2 <- lm(sc.mass ~ Event, data = leye.cs)
+m3 <- lm(sc.mass ~ DaysIntoSeason_S, data = leye.cs)
+m4 <- lm(sc.mass ~ ts.sunrise, data = leye.cs)
+m5 <- lm(sc.mass ~ PercentAg, data = leye.cs)
+m6 <- lm(sc.mass ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- lm(sc.mass ~ Sex + Event, data = leye.cs)
+m8 <- lm(sc.mass ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m9 <- lm(sc.mass ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- lm(sc.mass ~ Sex + PercentAg, data = leye.cs)
+m11 <- lm(sc.mass ~ Sex + Detection, data = leye.cs)
+m12 <- lm(sc.mass ~ Event + DaysIntoSeason_S, data = leye.cs)
+m13 <- lm(sc.mass ~ Event + ts.sunrise, data = leye.cs)
+m14 <- lm(sc.mass ~ Event + PercentAg, data = leye.cs)
+m15 <- lm(sc.mass ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m16 <- lm(sc.mass ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m17 <- lm(sc.mass ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m18 <- lm(sc.mass ~ ts.sunrise + PercentAg, data = leye.cs)
+m19 <- lm(sc.mass ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- lm(sc.mass ~ PercentAg + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m22 <- lm(sc.mass ~ Sex + Event + ts.sunrise, data = leye.cs)
+m23 <- lm(sc.mass ~ Sex + Event + PercentAg, data = leye.cs)
+m24 <- lm(sc.mass ~ Sex + Event + Detection, data = leye.cs)
+m25 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m26 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m27 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m28 <- lm(sc.mass ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m29 <- lm(sc.mass ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- lm(sc.mass ~ Sex + PercentAg + Detection, data = leye.cs)
+m31 <- lm(sc.mass ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(sc.mass ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(sc.mass ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(sc.mass ~ Event + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(sc.mass ~ Event + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(sc.mass ~ Event + PercentAg + Detection, data = leye.cs)
+m37 <- lm(sc.mass ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m38 <- lm(sc.mass ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m39 <- lm(sc.mass ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m40 <- lm(sc.mass ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m42 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m43 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m44 <- lm(sc.mass ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
+m45 <- lm(sc.mass ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
+m46 <- lm(sc.mass ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m47 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m48 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m49 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m50 <- lm(sc.mass ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m51 <- lm(sc.mass ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m52 <- lm(sc.mass ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m53 <- lm(sc.mass ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m54 <- lm(sc.mass ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m55 <- lm(sc.mass ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m57 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m58 <- lm(sc.mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m59 <- lm(sc.mass ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m60 <- lm(sc.mass ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m61 <- lm(sc.mass ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+-------------------------------
+
+Model selection based on AICc:
+
+         K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m.null   2 173.69       0.00   0.15   0.15 -84.73
+m4       3 174.86       1.17   0.09   0.24 -84.19
+m5       3 175.12       1.43   0.08   0.32 -84.32
+m3       3 175.15       1.46   0.07   0.39 -84.33
+m6       3 175.87       2.18   0.05   0.44 -84.70
+m1       3 175.94       2.24   0.05   0.49 -84.73
+m18      4 176.27       2.58   0.04   0.54 -83.73
+m15      4 176.47       2.78   0.04   0.57 -83.83
+m19      4 177.15       3.46   0.03   0.60 -84.17
+m9       4 177.19       3.50   0.03   0.63 -84.19
+m16      4 177.23       3.53   0.03   0.65 -84.20
+m20      4 177.42       3.73   0.02   0.68 -84.30
+m10      4 177.43       3.74   0.02   0.70 -84.31
+m17      4 177.47       3.78   0.02   0.73 -84.33
+m8       4 177.48       3.79   0.02   0.75 -84.33
+m2       4 177.63       3.94   0.02   0.77 -84.41
+m11      4 178.21       4.52   0.02   0.79 -84.70
+m12      5 178.53       4.84   0.01   0.80 -83.64
+m37      5 178.54       4.85   0.01   0.81 -83.65
+m40      5 178.68       4.99   0.01   0.83 -83.72
+m28      5 178.70       5.01   0.01   0.84 -83.72
+m14      5 178.78       5.09   0.01   0.85 -83.77
+m38      5 178.88       5.19   0.01   0.86 -83.82
+m25      5 178.89       5.20   0.01   0.87 -83.82
+m13      5 179.36       5.67   0.01   0.88 -84.05
+m29      5 179.57       5.88   0.01   0.89 -84.16
+m26      5 179.65       5.96   0.01   0.90 -84.20
+m39      5 179.66       5.97   0.01   0.91 -84.20
+m30      5 179.84       6.15   0.01   0.91 -84.29
+m27      5 179.90       6.21   0.01   0.92 -84.33
+m7       5 180.03       6.34   0.01   0.93 -84.39
+m31      6 180.40       6.71   0.01   0.93 -83.31
+m34      6 180.62       6.93   0.00   0.94 -83.42
+m36      6 180.72       7.03   0.00   0.94 -83.47
+m33      6 180.75       7.06   0.00   0.95 -83.48
+m32      6 180.80       7.11   0.00   0.95 -83.51
+m21      6 181.03       7.34   0.00   0.96 -83.62
+m55      6 181.08       7.39   0.00   0.96 -83.65
+m47      6 181.08       7.39   0.00   0.96 -83.65
+m50      6 181.22       7.53   0.00   0.97 -83.72
+m23      6 181.32       7.63   0.00   0.97 -83.76
+m48      6 181.41       7.71   0.00   0.97 -83.81
+m35      6 181.68       7.99   0.00   0.98 -83.95
+m22      6 181.85       8.16   0.00   0.98 -84.03
+m49      6 182.19       8.50   0.00   0.98 -84.20
+m24      6 182.20       8.51   0.00   0.98 -84.21
+m51      7 182.78       9.09   0.00   0.98 -83.17
+m54      7 182.84       9.15   0.00   0.99 -83.20
+m52      7 182.85       9.16   0.00   0.99 -83.21
+m53      7 182.98       9.29   0.00   0.99 -83.27
+m41      7 183.01       9.31   0.00   0.99 -83.29
+m44      7 183.26       9.57   0.00   0.99 -83.41
+m43      7 183.34       9.65   0.00   0.99 -83.45
+m46      7 183.36       9.67   0.00   0.99 -83.46
+m42      7 183.43       9.74   0.00   1.00 -83.50
+m60      7 183.73      10.03   0.00   1.00 -83.65
+m45      7 184.26      10.57   0.00   1.00 -83.91
+m61      8 185.22      11.53   0.00   1.00 -83.01
+m56      8 185.52      11.83   0.00   1.00 -83.16
+m57      8 185.55      11.86   0.00   1.00 -83.18
+m59      8 185.59      11.90   0.00   1.00 -83.20
+m58      8 185.72      12.03   0.00   1.00 -83.26
+m.global 9 188.08      14.39   0.00   1.00 -83.00
+
+-------------------------------
+
+*Null model performed the best
+
+*Top Model Summaries:
+
+2. Size-corrected Mass ~ Capture time (non-significant) (m4)
+
+3. Size-corrected Mass ~ Agricultural Intensity (continuous); non-significant (m5)
+
+4. Size-corrected Mass ~ Date into season (non-significant) (m3)
+

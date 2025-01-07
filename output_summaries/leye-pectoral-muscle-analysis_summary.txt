@@ -1,0 +1,371 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs pectoral muscle analysis. 
+
+Date Created: 2024-11-13
+Date Modified: 2024-12-09
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 41)
+
+## Univariate Analysis: Date ####
+
+m1 <- lm(PecSizeBest ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- lm(PecSizeBest ~ Julian, data = leye.cs)
+
+model_names <- paste0("m", 1:2)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 3  116       0.00   0.64   0.64 -54.6
+m2 3  117       1.17   0.36   1.00 -55.2
+
+
+**Conclusion: Date into trapping season performs better than Julian date but fairly similar
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoids ####
+
+m1 <- lm(PecSizeBest ~ Detection, data = leye.cs)
+m2 <- lm(PecSizeBest ~ OverallNeonic, data = leye.cs)
+m3 <- lm(PecSizeBest ~ LogNeonic, data = leye.cs)
+
+model_names <- paste0("m", 1:3)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m3 3 113.68       0.00   0.70   0.70 -53.52
+m1 3 115.55       1.86   0.27   0.97 -54.45
+m2 3 120.11       6.43   0.03   1.00 -56.73
+
+**Conclusion: Detection and Log transformation of concentrations perform significantly better
+** Use Detection for consistency with other models.
+
+-------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- lm(PecSizeBest ~ PercentAg, data = leye.cs)
+m2 <- lm(PecSizeBest ~ I(PercentAg^2), data = leye.cs)
+m3 <- lm(PecSizeBest ~ LogAg, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 3  118       0.00   0.47   0.47 -55.5
+m3 3  118       0.63   0.34   0.81 -55.9
+m2 3  120       1.82   0.19   1.00 -56.4
+
+# Continuous predictor performs best (PercentAg)
+
+---------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lm(PecSizeBest ~ Event * ts.sunrise, data = leye.cs)
+m2 <- lm(PecSizeBest ~ Event + I(ts.sunrise^2), data = leye.cs)
+m3 <- lm(PecSizeBest ~ Event + ts.sunrise, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 5  119       0.00   0.46   0.46 -53.6
+m2 4  120       1.07   0.27   0.74 -55.4
+m3 4  120       1.12   0.26   1.00 -55.4
+
+# Model with interaction performs best.
+
+-------------------------------
+
+INTERACTIONS INCLUDED: EVENT * TIME
+
+-------------------------------
+
+
+m.global <- lm(PecSizeBest ~ Sex + Event*ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+                 data = leye.cs)
+
+m.null <- lm(PecSizeBest ~ 1, data = leye.cs)
+
+m1 <- lm(PecSizeBest ~ Sex, data = leye.cs)
+m2 <- lm(PecSizeBest ~ Event, data = leye.cs)
+m3 <- lm(PecSizeBest ~ DaysIntoSeason_S, data = leye.cs)
+m4 <- lm(PecSizeBest ~ ts.sunrise, data = leye.cs)
+m5 <- lm(PecSizeBest ~ PercentAg, data = leye.cs)
+m6 <- lm(PecSizeBest ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- lm(PecSizeBest ~ Sex + Event, data = leye.cs)
+m8 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m9 <- lm(PecSizeBest ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- lm(PecSizeBest ~ Sex + PercentAg, data = leye.cs)
+m11 <- lm(PecSizeBest ~ Sex + Detection, data = leye.cs)
+m12 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S, data = leye.cs)
+m13 <- lm(PecSizeBest ~ Event * ts.sunrise, data = leye.cs)
+m14 <- lm(PecSizeBest ~ Event + PercentAg, data = leye.cs)
+m15 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m16 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m17 <- lm(PecSizeBest ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m18 <- lm(PecSizeBest ~ ts.sunrise + PercentAg, data = leye.cs)
+m19 <- lm(PecSizeBest ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- lm(PecSizeBest ~ PercentAg + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m22 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise, data = leye.cs)
+m23 <- lm(PecSizeBest ~ Sex + Event + PercentAg, data = leye.cs)
+m24 <- lm(PecSizeBest ~ Sex + Event + Detection, data = leye.cs)
+m25 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m26 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m27 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m28 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m29 <- lm(PecSizeBest ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- lm(PecSizeBest ~ Sex + PercentAg + Detection, data = leye.cs)
+m31 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m32 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(PecSizeBest ~ Event * ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(PecSizeBest ~ Event + PercentAg + Detection, data = leye.cs)
+m37 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m38 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m39 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m40 <- lm(PecSizeBest ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event*ts.sunrise, data = leye.cs)
+m42 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m43 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m44 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs)
+m45 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
+m46 <- lm(PecSizeBest ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m47 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m48 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m49 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m50 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m51 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event*ts.sunrise, data = leye.cs)
+m52 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event*ts.sunrise, data = leye.cs)
+m53 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m54 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m55 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
+m57 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m58 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m59 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m60 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m61 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event*ts.sunrise, data = leye.cs)
+
+-------------------------------
+
+### AIC Model Selection ####
+
+Model selection based on AICc:
+
+         K AICc Delta_AICc AICcWt Cum.Wt    LL
+m6       3  116       0.00   0.09   0.09 -54.5
+m3       3  116       0.40   0.07   0.16 -54.6
+m17      4  116       0.45   0.07   0.23 -53.4
+m20      4  116       0.74   0.06   0.29 -53.6
+m19      4  117       1.71   0.04   0.33 -54.1
+m15      4  117       1.88   0.03   0.36 -54.2
+m11      4  118       1.96   0.03   0.39 -54.2
+m38      5  118       2.05   0.03   0.42 -52.9
+m5       3  118       2.17   0.03   0.45 -55.5
+m33      5  118       2.36   0.03   0.48 -53.1
+m40      5  118       2.47   0.03   0.51 -53.1
+m8       4  118       2.54   0.02   0.53 -54.5
+m27      5  118       2.67   0.02   0.55 -53.2
+m12      4  118       2.80   0.02   0.58 -54.6
+m16      4  118       2.81   0.02   0.60 -54.6
+m39      5  118       2.92   0.02   0.62 -53.4
+m30      5  118       2.95   0.02   0.64 -53.4
+m2       3  119       3.09   0.02   0.66 -56.0
+m35      6  119       3.15   0.02   0.67 -52.1
+m36      5  119       3.27   0.02   0.69 -53.5
+m31      6  119       3.28   0.02   0.71 -52.2
+m13      5  119       3.29   0.02   0.73 -53.6
+m52      7  119       3.33   0.02   0.74 -50.7
+m14      4  119       3.40   0.02   0.76 -54.9
+m29      5  119       3.70   0.01   0.77 -53.8
+m18      4  119       3.89   0.01   0.78 -55.2
+m34      6  120       4.00   0.01   0.80 -52.5
+m25      5  120       4.06   0.01   0.81 -54.0
+m.null   2  120       4.11   0.01   0.82 -57.7
+m10      4  120       4.29   0.01   0.83 -55.4
+m48      6  120       4.32   0.01   0.84 -52.7
+m54      7  120       4.36   0.01   0.85 -51.3
+m37      5  120       4.44   0.01   0.86 -54.1
+m24      5  120       4.56   0.01   0.87 -54.2
+m43      6  120       4.57   0.01   0.88 -52.8
+m55      6  120       4.69   0.01   0.88 -52.9
+m50      6  120       4.73   0.01   0.89 -52.9
+m26      5  121       5.09   0.01   0.90 -54.5
+m53      6  121       5.10   0.01   0.91 -53.1
+m21      5  121       5.10   0.01   0.91 -54.5
+m7       4  121       5.28   0.01   0.92 -55.9
+m49      6  121       5.30   0.01   0.93 -53.2
+m32      5  121       5.31   0.01   0.93 -54.6
+m46      6  121       5.58   0.01   0.94 -53.3
+m45      7  121       5.65   0.01   0.94 -51.9
+m23      5  121       5.76   0.00   0.95 -54.8
+m22      6  121       5.81   0.00   0.95 -53.4
+m4       3  121       5.90   0.00   0.96 -57.4
+m1       3  121       5.93   0.00   0.96 -57.4
+m41      7  121       5.94   0.00   0.97 -52.0
+m57      8  122       5.98   0.00   0.97 -50.5
+m28      5  122       6.06   0.00   0.97 -55.0
+m51      7  122       6.14   0.00   0.98 -52.1
+m61      8  122       6.43   0.00   0.98 -50.7
+m44      7  122       6.72   0.00   0.98 -52.4
+m47      6  122       6.79   0.00   0.99 -53.9
+m59      8  123       7.09   0.00   0.99 -51.1
+m60      7  123       7.14   0.00   0.99 -52.6
+m58      7  123       7.49   0.00   0.99 -52.8
+m9       4  123       7.77   0.00   1.00 -57.1
+m42      6  123       7.78   0.00   1.00 -54.4
+m56      8  125       9.00   0.00   1.00 -52.0
+m.global 9  125       9.28   0.00   1.00 -50.5
+
+-------------------------------
+
+# Top Model Summaries
+
+1. Pectoral Muscle ~ Detection
+
+                       Estimate Std. Error t value Pr(>|t|)   2.5 % 97.5 %
+(Intercept)               0.448      0.227    1.97   0.0559 -0.0118  0.907
+DetectionNon-detection   -0.765      0.297   -2.58   0.0139 -1.3648 -0.164
+
+**Conclusion: Birds with detections had significantly larger pectoral muscles.
+
+Residual standard error: 0.936 on 39 degrees of freedom
+Multiple R-squared:  0.145,	Adjusted R-squared:  0.123 
+F-statistic: 6.64 on 1 and 39 DF,  p-value: 0.0139
+
+# Low fit but significant relationship
+
+2. Pectoral Muscle ~ Days into Trapping Season
+
+                 Estimate Std. Error   t value Pr(>|t|)  2.5 %  97.5 %
+(Intercept)       6.8e-17      0.147  4.63e-16   1.0000 -0.297  0.2972
+DaysIntoSeason_S -3.7e-01      0.149 -2.49e+00   0.0172 -0.671 -0.0693
+
+**Conclusion: There is a negative effect of date into trapping season on pectoral muscle size. As the date into the trapping season progresses, pectoral muscle size decreases. (Opposite of prediction)
+
+Residual standard error: 0.941 on 39 degrees of freedom
+Multiple R-squared:  0.137,	Adjusted R-squared:  0.115 
+F-statistic: 6.19 on 1 and 39 DF,  p-value: 0.0172
+
+3. Pectoral Muscle ~ Days Into Trapping Season + Detection
+
+                       Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)               0.304      0.247    1.23    0.226 -0.196  0.805
+DaysIntoSeason_S         -0.236      0.171   -1.38    0.175 -0.582  0.110
+DetectionNon-detection   -0.520      0.343   -1.52    0.137 -1.213  0.173
+
+**Conclusion: Neither effect is significant.
+
+Residual standard error: 0.925 on 38 degrees of freedom
+Multiple R-squared:  0.186,	Adjusted R-squared:  0.144 
+F-statistic: 4.35 on 2 and 38 DF,  p-value: 0.0199
+
+4. Pectoral Muscle ~ Detection + Agricultural Intensity
+
+                       Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)               0.361      0.235    1.53   0.1335 -0.116 0.8370
+PercentAg                -0.202      0.158   -1.28   0.2091 -0.521 0.1179
+DetectionNon-detection   -0.616      0.316   -1.95   0.0589 -1.257 0.0245
+
+# Conclusion: No significant effects on pectoral muscle.
+
+Residual standard error: 0.929 on 38 degrees of freedom
+Multiple R-squared:  0.181,	Adjusted R-squared:  0.137 
+F-statistic: 4.19 on 2 and 38 DF,  p-value: 0.0227
+
+5. Pectoral Muscle ~ Capture Time + Detection
+
+                       Estimate Std. Error t value Pr(>|t|)    2.5 % 97.5 %
+(Intercept)               0.452      0.228   1.981   0.0549 -0.00995  0.913
+ts.sunrise               -0.125      0.149  -0.841   0.4059 -0.42586  0.176
+DetectionNon-detection   -0.771      0.298  -2.588   0.0136 -1.37473 -0.168
+
+# Conclusion: Birds with detections had significant larger pectoral muscles...
+
+Residual standard error: 0.94 on 38 degrees of freedom
+Multiple R-squared:  0.161,	Adjusted R-squared:  0.117 
+F-statistic: 3.65 on 2 and 38 DF,  p-value: 0.0356
+
+6. Pectoral Muscle ~ Date + Capture Time
+
+                  Estimate Std. Error   t value Pr(>|t|)  2.5 %  97.5 %
+(Intercept)       6.23e-17      0.147  4.24e-16   1.0000 -0.298  0.2977
+DaysIntoSeason_S -3.81e-01      0.149 -2.55e+00   0.0149 -0.683 -0.0788
+ts.sunrise       -1.43e-01      0.149 -9.61e-01   0.3428 -0.446  0.1589
+
+# Conclusion: Negative relationship between date and pectoral muscle (as date increases, pectoral muscle decreases...)
+
+Residual standard error: 0.943 on 38 degrees of freedom
+Multiple R-squared:  0.156,	Adjusted R-squared:  0.111 
+F-statistic: 3.51 on 2 and 38 DF,  p-value: 0.04
+
+7. Pectoral Muscle ~ Sex + Detection
+
+                       Estimate Std. Error t value Pr(>|t|)    2.5 % 97.5 %
+(Intercept)               0.522      0.253   2.063   0.0459  0.00987  1.033
+SexFemale                -0.210      0.306  -0.687   0.4962 -0.82891  0.409
+DetectionNon-detection   -0.760      0.299  -2.542   0.0152 -1.36494 -0.155
+
+# Conclusion: Birds with detections had significant larger pectoral muscles...
+
+Residual standard error: 0.943 on 38 degrees of freedom
+Multiple R-squared:  0.156,	Adjusted R-squared:  0.111 
+F-statistic: 3.51 on 2 and 38 DF,  p-value: 0.04
+
+-------------------------------
+
+# NOT A TOP MODEL BUT INTERESTING: weak fit but still worth mentioning I think
+
+Model: Pectoral Muscle ~ Agricultural Intensity (AICc = 2.17, wt = 0.03)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-2.038 -0.800  0.192  0.774  1.962 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)  
+(Intercept) -2.31e-16   1.50e-01    0.00    1.000  
+PercentAg   -3.14e-01   1.52e-01   -2.07    0.045 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.961 on 39 degrees of freedom
+Multiple R-squared:  0.0989,	Adjusted R-squared:  0.0758 
+F-statistic: 4.28 on 1 and 39 DF,  p-value: 0.0453
+
+             2.5 %   97.5 %
+(Intercept) -0.304  0.30369
+PercentAg   -0.622 -0.00696
+
+-------------------------------
+
+# Model Validation
+
+*all assumptions met for top models
+-------------------------------
+
+Notes: What to do about pectoral muscle and ag intensity relationship??

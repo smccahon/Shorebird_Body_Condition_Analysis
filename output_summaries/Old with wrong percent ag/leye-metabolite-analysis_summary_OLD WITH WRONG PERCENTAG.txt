@@ -1,0 +1,286 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs metabolite analysis. 
+
+Date Created: 2024-11-25
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 29)
+
+-------------------------------
+
+# Lesser Yellowlegs Modeling ####
+
+## Univariate Analysis: Date ####
+
+m1 <- lm(PC1 ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- lm(PC1 ~ Julian, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3 99.5       0.00   0.54   0.54 -46.3
+m1 3 99.8       0.31   0.46   1.00 -46.4
+
+# Julian performs better (wt = 0.54) but use date into trapping season for consistency
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoids ####
+
+m1 <- lm(PC1 ~ Detection, data = leye.cs)
+m2 <- lm(PC1 ~ OverallNeonic, data = leye.cs)
+m3 <- lm(PC1 ~ LogNeonic, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 3 99.4       0.00   0.36   0.36 -46.2
+m3 3 99.5       0.15   0.34   0.70 -46.3
+m2 3 99.8       0.41   0.30   1.00 -46.4
+
+# All perform similarly (detection performs best)
+# Use detection for consistency
+
+-------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- lm(PC1 ~ PercentAg, data = leye.cs)
+m2 <- lm(PC1 ~ I(PercentAg^2), data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 3 97.4       0.00   0.77   0.77 -45.2
+m2 3 99.8       2.42   0.23   1.00 -46.5
+
+# Linear relationship performs better
+
+## Univariate Analysis: Agricultural Intensity as Categorical Predictor ####
+
+m1 <- lm(PC1 ~ PercentAg, data = leye.cs)
+m2 <- lm(PC1 ~ I(PercentAg^2), data = leye.cs)
+m3 <- lm(PC1 ~ AgIntensity, data = leye.cs)
+
+Model selection based on AICc:
+
+   K  AICc Delta_AICc AICcWt Cum.Wt     LL
+m3 4 93.13       0.00   0.87   0.87 -41.73
+m1 3 97.44       4.31   0.10   0.97 -45.24
+m2 3 99.92       6.80   0.03   1.00 -46.48
+
+# Categorical predictor performs significantly better. See results using categorical predictor vs. continuous predictor below.
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lm(PC1 ~ Event * ts.sunrise, data = leye.cs)
+m2 <- lm(PC1 ~ Event + I(ts.sunrise^2), data = leye.cs)
+m3 <- lm(PC1 ~ Event + ts.sunrise, data = leye.cs)
+
+Model selection based on AICc:
+
+   K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m3 5  98.3       0.00   0.85   0.85 -42.9
+m2 5 102.5       4.16   0.11   0.96 -45.0
+m1 7 104.5       6.19   0.04   1.00 -42.6
+
+# Model without interaction performs the best.
+# Model with interaction performs the worst.
+
+-------------------------------
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- lm(PC1 ~ Event * Detection, data = leye.cs)
+m2 <- lm(PC1 ~ Event + Detection, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 5  104       0.00   0.83   0.83 -45.5
+m1 6  107       3.18   0.17   1.00 -45.5
+
+# Model without interaction performs the best.
+
+-------------------------------
+
+# INTERACTIONS INCLUDED: NONE
+
+-------------------------------
+
+## Single Models ####
+
+m.global <- lm(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+               data = leye.cs)
+
+m.null <- lm(PC1 ~ 1, data = leye.cs)
+
+m1 <- lm(PC1 ~ Sex, data = leye.cs)
+m2 <- lm(PC1 ~ Event, data = leye.cs)
+m3 <- lm(PC1 ~ DaysIntoSeason_S, data = leye.cs)
+m4 <- lm(PC1 ~ ts.sunrise, data = leye.cs)
+m5 <- lm(PC1 ~ PercentAg, data = leye.cs)
+m6 <- lm(PC1 ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- lm(PC1 ~ Sex + Event, data = leye.cs)
+m8 <- lm(PC1 ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m9 <- lm(PC1 ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- lm(PC1 ~ Sex + PercentAg, data = leye.cs)
+m11 <- lm(PC1 ~ Sex + Detection, data = leye.cs)
+m12 <- lm(PC1 ~ Event + DaysIntoSeason_S, data = leye.cs)
+m13 <- lm(PC1 ~ Event + ts.sunrise, data = leye.cs)
+m14 <- lm(PC1 ~ Event + PercentAg, data = leye.cs)
+m15 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m16 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m17 <- lm(PC1 ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m18 <- lm(PC1 ~ ts.sunrise + PercentAg, data = leye.cs)
+m19 <- lm(PC1 ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- lm(PC1 ~ PercentAg + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m22 <- lm(PC1 ~ Sex + Event + ts.sunrise, data = leye.cs)
+m23 <- lm(PC1 ~ Sex + Event + PercentAg, data = leye.cs)
+m24 <- lm(PC1 ~ Sex + Event + Detection, data = leye.cs)
+m25 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m26 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m27 <- lm(PC1 ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m28 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m29 <- lm(PC1 ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- lm(PC1 ~ Sex + PercentAg + Detection, data = leye.cs)
+m31 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(PC1 ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(PC1 ~ Event + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(PC1 ~ Event + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(PC1 ~ Event + PercentAg + Detection, data = leye.cs)
+m37 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m38 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m39 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m40 <- lm(PC1 ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m42 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m43 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m44 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
+m45 <- lm(PC1 ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
+m46 <- lm(PC1 ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m47 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m48 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m49 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m50 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m51 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m52 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m53 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m54 <- lm(PC1 ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m55 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m57 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m58 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m59 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m60 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m61 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+-------------------------------
+
+#AIC Model Selection
+
+Model selection based on AICc (shortened and standardized):
+
+         K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m18      4  93.5       0.00   0.18   0.18 -41.9
+m4       3  94.3       0.78   0.12   0.31 -43.7
+m28      5  95.2       1.72   0.08   0.39 -41.3
+m37      5  95.5       1.97   0.07   0.45 -41.4
+m9       4  95.9       2.40   0.06   0.51 -43.1
+.
+.
+.
+
+-------------------------------
+
+#Top Model Summaries
+
+1. Fattening Index ~ Capture Time + Agricultural Intensity (m18)
+
+            Estimate Std. Error t value Pr(>|t|)   2.5 % 97.5 %
+(Intercept)   0.0863      0.208   0.414   0.6821 -0.3418 0.5143
+ts.sunrise    0.4611      0.178   2.584   0.0157  0.0943 0.8279
+PercentAg    -0.4149      0.228  -1.822   0.0799 -0.8829 0.0531
+
+Conclusions: 
+*Capture time has a significant impact on fattening index. 
+*Linear transformation of capture time may not be the appropriate choice, but quadratic does not fix it. GAM would be a better approach.
+*2 peak times for gaining energy reserves and 2 peak times for losing energy reserves. 
+*No impact of agricultural intensity on fattening index. Trending negative but there are way more points in the moderate - high agricultural intensity groups than low...
+
+2. Fattening Index ~ Capture Time (m4)
+
+            Estimate Std. Error t value Pr(>|t|)   2.5 % 97.5 %
+(Intercept) -0.00986      0.210  -0.047   0.9629 -0.4406  0.421
+ts.sunrise   0.44752      0.186   2.409   0.0231  0.0663  0.829
+
+Conclusions: 
+*Capture time has a significant impact on fattening index. 
+
+3. Fattening Index ~ Sex + Capture Time + Agricultural Intensity (m28)
+
+            Estimate Std. Error t value Pr(>|t|)   2.5 % 97.5 %
+(Intercept)    0.295      0.289    1.02   0.3176 -0.3007 0.8907
+SexFemale     -0.430      0.414   -1.04   0.3091 -1.2839 0.4234
+ts.sunrise     0.416      0.183    2.27   0.0324  0.0378 0.7936
+PercentAg     -0.415      0.227   -1.82   0.0800 -0.8830 0.0534
+
+Conclusions: 
+*Capture time has a significant impact on fattening index. 
+*Sex and agricultural intensity do not have significant impacts on fattening index.
+
+-------------------------------
+
+# Overall conclusion:
+*None of the top models contain neonicotinoid detections. Capture time is the only significant predictor of fattening index. I fit a GAM to the data and there are four clear peaks. 
+
+-------------------------------
+
+# Top Model Summaries using Agricultural Intensity as Categorical Predictor:
+
+Model selection based on AICc (shortened and standardized):
+
+          K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m18       5  86.93       0.00   0.34   0.34 -37.16
+m37       6  88.16       1.23   0.18   0.52 -36.17
+m34       7  89.54       2.62   0.09   0.62 -35.11
+.
+.
+.
+
+1. Fattening Index ~ Capture Time + Agricultural Intensity (m18)
+
+                    Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)            0.727      0.546   1.331  0.19528 -0.398  1.852
+ts.sunrise             0.545      0.179   3.043  0.00544  0.176  0.914
+AgIntensityModerate   -0.459      0.586  -0.783  0.44102 -1.667  0.749
+AgIntensityHigh       -1.984      0.668  -2.970  0.00649 -3.360 -0.608
+
+# Birds captured in high agricultural intensity wetlands had reduced refueling!
+
+2. Fattening Index ~ Capture Time + Date + Agricultural Intensity (m37)
+
+                    Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)            1.111      0.614    1.81  0.08307 -0.157  2.379
+DaysIntoSeason_S       0.269      0.206    1.30  0.20532 -0.157  0.695
+ts.sunrise             0.518      0.178    2.92  0.00755  0.152  0.885
+AgIntensityModerate   -0.869      0.658   -1.32  0.19952 -2.228  0.490
+AgIntensityHigh       -2.475      0.759   -3.26  0.00332 -4.042 -0.908
+
+# Birds captured in high agricultural intensity wetlands had reduced refueling!
+

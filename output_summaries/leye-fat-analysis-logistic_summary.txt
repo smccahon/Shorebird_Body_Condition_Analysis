@@ -1,0 +1,429 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs logistic fat analysis. 
+
+Date Created: 2024-12-16
+Date Modified: 2024-12-16
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 43)
+
+-------------------------------
+
+*Note: I excluded birds from spring 2022. All birds in spring 2022 had detections and low fat (0 or 1). Event perfectly predicts fat. Analysis below excludes these birds (n = 11)
+
+*Note: Categorized fat into low (0-2) and high (3-5) and ran a logistic regression due to small sample size. There were not enough observations to perform an ordinal logistic regression on the data.
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- glm(Fat.G ~ Event * ts.sunrise, data = leye.cs, family = "binomial")
+m2 <- glm(Fat.G ~ Event + ts.sunrise, data = leye.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4 58.7       0.00   0.76   0.76 -24.8
+m2 3 61.0       2.28   0.24   1.00 -27.2
+
+# Model with interaction performs significantly better.
+
+-------------------------------
+
+## Univariate Analysis: Time
+
+m1 <- glm(Fat.G ~ ts.sunrise, data = leye.cs, family = "binomial")
+m2 <- glm(Fat.G ~ ts.sunrise + I(ts.sunrise^2), data = leye.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3 60.2        0.0   0.72   0.72 -26.8
+m1 2 62.1        1.9   0.28   1.00 -28.9
+
+## Quadratic relationship or interaction? ####
+m1 <- glm(Fat.G ~ Event * ts.sunrise, data = leye.cs, family = "binomial")
+m2 <- glm(Fat.G ~ Event + ts.sunrise + I(ts.sunrise^2), data = leye.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4 58.7       0.00    0.8    0.8 -24.8
+m2 4 61.5       2.78    0.2    1.0 -26.2
+
+# Model with interaction performs significantly better
+
+-------------------------------
+
+## Single Models ####
+
+m.global <- glm(Fat.G ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+               data = leye.cs, family = "binomial")
+
+
+m.null <- glm(Fat.G ~ 1, data = leye.cs, family = "binomial")
+
+m1 <- glm(Fat.G ~ Sex, data = leye.cs, family = "binomial")
+m2 <- glm(Fat.G ~ Event, data = leye.cs, family = "binomial")
+m3 <- glm(Fat.G ~ DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m4 <- glm(Fat.G ~ ts.sunrise, data = leye.cs, family = "binomial")
+m5 <- glm(Fat.G ~ PercentAg, data = leye.cs, family = "binomial")
+m6 <- glm(Fat.G ~ Detection, data = leye.cs, family = "binomial")
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- glm(Fat.G ~ Sex + Event, data = leye.cs, family = "binomial")
+m8 <- glm(Fat.G ~ Sex + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m9 <- glm(Fat.G ~ Sex + ts.sunrise, data = leye.cs, family = "binomial")
+m10 <- glm(Fat.G ~ Sex + PercentAg, data = leye.cs, family = "binomial")
+m11 <- glm(Fat.G ~ Sex + Detection, data = leye.cs, family = "binomial")
+m12 <- glm(Fat.G ~ Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m13 <- glm(Fat.G ~ Event * ts.sunrise, data = leye.cs, family = "binomial")
+m14 <- glm(Fat.G ~ Event + PercentAg, data = leye.cs, family = "binomial")
+m15 <- glm(Fat.G ~ Event + Detection, data = leye.cs, family = "binomial")
+m16 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
+m17 <- glm(Fat.G ~ DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m18 <- glm(Fat.G ~ DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m19 <- glm(Fat.G ~ ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m20 <- glm(Fat.G ~ ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m21 <- glm(Fat.G ~ PercentAg + Detection, data = leye.cs, family = "binomial")
+
+### Three additive combinations ####
+m22 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m23 <- glm(Fat.G ~ Sex + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m24 <- glm(Fat.G ~ Sex + Event + PercentAg, data = leye.cs, family = "binomial")
+m25 <- glm(Fat.G ~ Sex + Event + Detection, data = leye.cs, family = "binomial")
+m26 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
+m27 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m28 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m29 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m30 <- glm(Fat.G ~ Sex + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m31 <- glm(Fat.G ~ Sex + PercentAg + Detection, data = leye.cs, family = "binomial")
+m32 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m33 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m34 <- glm(Fat.G ~ Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m35 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m36 <- glm(Fat.G ~ Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m37 <- glm(Fat.G ~ Event + PercentAg + Detection, data = leye.cs, family = "binomial")
+m38 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m39 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m40 <- glm(Fat.G ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m41 <- glm(Fat.G ~ ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+
+### Four additive combinations ####
+m42 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m43 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m44 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m45 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m46 <- glm(Fat.G ~ Sex + Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m47 <- glm(Fat.G ~ Sex + Event + PercentAg + Detection, data = leye.cs, family = "binomial")
+m48 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m49 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m50 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m51 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m52 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m53 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m54 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m55 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m56 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+
+### Five additive combinations ####
+
+m57 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m58 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m59 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m60 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m61 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m62 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+
+-------------------------------
+
+Model selection based on AICc:
+
+         K AICc Delta_AICc AICcWt Cum.Wt    LL
+m45      6 57.0       0.00   0.08   0.08 -21.3
+m35      5 57.3       0.33   0.07   0.16 -22.8
+m14      3 57.5       0.49   0.07   0.22 -25.4
+m24      4 58.2       1.24   0.05   0.27 -24.6
+m13      4 58.7       1.71   0.04   0.30 -24.8
+m23      5 58.9       1.90   0.03   0.34 -23.6
+m10      3 59.2       2.23   0.03   0.36 -26.3
+m3       2 59.3       2.30   0.03   0.39 -27.5
+m37      4 59.3       2.33   0.03   0.42 -25.1
+m57      7 59.3       2.35   0.03   0.44 -21.1
+m2       2 59.4       2.43   0.03   0.47 -27.6
+m33      4 59.5       2.54   0.02   0.49 -25.2
+m52      6 59.6       2.60   0.02   0.52 -22.6
+m5       2 59.8       2.84   0.02   0.54 -27.8
+m60      7 59.8       2.85   0.02   0.56 -21.3
+m55      6 59.9       2.96   0.02   0.58 -22.8
+m21      3 60.0       3.04   0.02   0.59 -26.7
+m8       3 60.1       3.16   0.02   0.61 -26.8
+m31      4 60.2       3.20   0.02   0.63 -25.6
+m29      4 60.2       3.21   0.02   0.65 -25.6
+m17      3 60.2       3.25   0.02   0.66 -26.8
+m32      5 60.3       3.32   0.02   0.68 -24.3
+m43      5 60.3       3.34   0.02   0.69 -24.3
+m47      5 60.3       3.36   0.02   0.71 -24.4
+m19      3 60.5       3.55   0.01   0.72 -26.9
+m27      4 60.5       3.55   0.01   0.74 -25.7
+m7       3 60.5       3.59   0.01   0.75 -27.0
+m42      6 60.6       3.59   0.01   0.77 -23.1
+m16      3 60.7       3.70   0.01   0.78 -27.0
+m12      3 60.7       3.77   0.01   0.79 -27.1
+m18      3 61.0       4.08   0.01   0.80 -27.2
+m36      5 61.2       4.22   0.01   0.81 -24.8
+m15      3 61.4       4.40   0.01   0.82 -27.4
+m40      4 61.4       4.48   0.01   0.83 -26.2
+m41      4 61.5       4.49   0.01   0.84 -26.2
+m54      5 61.5       4.51   0.01   0.85 -24.9
+m.null   1 61.5       4.53   0.01   0.86 -29.7
+m38      4 61.5       4.58   0.01   0.87 -26.2
+m46      6 61.6       4.60   0.01   0.88 -23.6
+m26      4 61.7       4.72   0.01   0.88 -26.3
+m1       2 61.7       4.73   0.01   0.89 -28.7
+m51      5 61.8       4.81   0.01   0.90 -25.1
+m22      4 62.0       5.01   0.01   0.91 -26.5
+m48      5 62.0       5.02   0.01   0.91 -25.2
+m4       2 62.1       5.11   0.01   0.92 -28.9
+m50      5 62.1       5.18   0.01   0.93 -25.3
+m28      4 62.2       5.25   0.01   0.93 -26.6
+m.global 8 62.3       5.38   0.01   0.94 -21.1
+m62      7 62.4       5.40   0.01   0.94 -22.6
+m9       3 62.5       5.54   0.01   0.95 -27.9
+m6       2 62.5       5.55   0.01   0.95 -29.1
+m59      6 62.6       5.61   0.01   0.96 -24.1
+m25      4 62.7       5.78   0.00   0.96 -26.9
+m39      4 62.8       5.81   0.00   0.97 -26.9
+m34      4 62.8       5.88   0.00   0.97 -26.9
+m53      6 63.0       5.99   0.00   0.98 -24.3
+m11      3 63.2       6.22   0.00   0.98 -28.3
+m56      5 63.2       6.27   0.00   0.98 -25.8
+m58      7 63.4       6.46   0.00   0.99 -23.1
+m20      3 63.7       6.69   0.00   0.99 -28.5
+m61      6 64.1       7.09   0.00   0.99 -24.9
+m49      5 64.1       7.11   0.00   1.00 -26.2
+m44      5 64.3       7.36   0.00   1.00 -26.4
+m30      4 64.5       7.50   0.00   1.00 -27.7
+
+-------------------------------
+
+# Top Model Summaries
+
+1. Fat ~ Sex + Event * Capture Time + Agricultural Intensity
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)  
+(Intercept)                  0.636      1.400    0.45    0.650  
+SexFemale                   -1.323      0.781   -1.69    0.090 .
+EventFall 2023               0.135      1.337    0.10    0.920  
+ts.sunrise                   5.655      3.887    1.45    0.146  
+PercentAg                    0.901      0.499    1.81    0.071 .
+EventFall 2023:ts.sunrise   -5.565      3.907   -1.42    0.154  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 42.631  on 37  degrees of freedom
+AIC: 54.63
+
+Number of Fisher Scoring iterations: 6
+
+# Event * time is significant; birds in high ag have significantly higher fat scores
+
+                             2.5 % 97.5 %
+(Intercept)                -1.9058  3.643
+SexFemale                  -2.9467  0.162
+EventFall 2023             -2.7912  2.562
+ts.sunrise                  0.8439 16.070
+PercentAg                   0.0713  2.206
+EventFall 2023:ts.sunrise -16.0041 -0.675
+
+Area under the curve: 0.836
+
+2. Fat ~ Event * Capture Time + Agricultural Intensity
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)                 -0.448      1.207   -0.37     0.71
+EventFall 2023               0.647      1.251    0.52     0.60
+ts.sunrise                   4.391      3.285    1.34     0.18
+PercentAg                    0.863      0.529    1.63     0.10
+EventFall 2023:ts.sunrise   -4.277      3.303   -1.29     0.20
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 45.669  on 38  degrees of freedom
+AIC: 55.67
+
+Number of Fisher Scoring iterations: 6
+
+                             2.5 % 97.5 %
+(Intercept)                -2.6561  2.411
+EventFall 2023             -2.2807  2.924
+ts.sunrise                  0.3816 13.919
+PercentAg                   0.0111  2.247
+EventFall 2023:ts.sunrise -13.8244 -0.192
+
+# Event * time is significant; birds in high ag have significantly higher fat scores
+
+Area under the curve: 0.786
+
+3. Fat ~ Agricultural Intensity + Event
+
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)  
+(Intercept)      -1.416      0.729   -1.94    0.052 .
+EventFall 2023    1.634      0.808    2.02    0.043 *
+PercentAg         0.848      0.499    1.70    0.089 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 50.835  on 40  degrees of freedom
+AIC: 56.84
+
+Number of Fisher Scoring iterations: 5
+
+                 2.5 % 97.5 %
+(Intercept)    -3.0603 -0.117
+EventFall 2023  0.1453  3.381
+PercentAg       0.0378  2.127
+
+# Birds in fall 2023 had significantly higher fat scores compared to fall 2021
+
+Area under the curve: 0.751
+
+4. Fat ~ Sex + Event + Agricultural Intensity
+
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)  
+(Intercept)      -0.854      0.833   -1.02    0.306  
+SexFemale        -0.901      0.701   -1.28    0.199  
+EventFall 2023    1.452      0.824    1.76    0.078 .
+PercentAg         0.878      0.483    1.82    0.069 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 49.155  on 39  degrees of freedom
+AIC: 57.15
+
+Number of Fisher Scoring iterations: 5
+
+                 2.5 % 97.5 %
+(Intercept)    -2.6659  0.700
+SexFemale      -2.3205  0.461
+EventFall 2023 -0.0822  3.223
+PercentAg       0.0810  2.118
+
+# Birds in high ag have significantly higher fat scores
+
+Area under the curve: 0.777
+
+5. Fat ~ Event * Capture Time
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)                -0.0839     1.1621   -0.07     0.94
+EventFall 2023              0.3366     1.2200    0.28     0.78
+ts.sunrise                  5.0131     3.6862    1.36     0.17
+EventFall 2023:ts.sunrise  -4.8935     3.7012   -1.32     0.19
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 49.625  on 39  degrees of freedom
+AIC: 57.63
+
+Number of Fisher Scoring iterations: 6
+
+
+                            2.5 % 97.5 %
+(Intercept)                -2.189  2.546
+EventFall 2023             -2.376  2.563
+ts.sunrise                  0.487 15.059
+EventFall 2023:ts.sunrise -14.956 -0.299
+
+# Event * time is significant
+
+Area under the curve: 0.714
+
+6. Fat ~ Sex + Event * Capture Time
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)                 0.7981     1.3303    0.60     0.55
+SexFemale                  -1.1006     0.7261   -1.52     0.13
+EventFall 2023             -0.0882     1.2876   -0.07     0.95
+ts.sunrise                  6.1430     4.0956    1.50     0.13
+EventFall 2023:ts.sunrise  -6.0400     4.1116   -1.47     0.14
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 59.401  on 42  degrees of freedom
+Residual deviance: 47.243  on 38  degrees of freedom
+AIC: 57.24
+
+Number of Fisher Scoring iterations: 6
+
+                            2.5 % 97.5 %
+(Intercept)                -1.620  3.607
+SexFemale                  -2.587  0.294
+EventFall 2023             -2.826  2.279
+ts.sunrise                  0.923 16.876
+EventFall 2023:ts.sunrise -16.792 -0.750
+
+# Event * time is significant
+
+Area under the curve: 0.714
+
+-------------------------------
+
+# Model Assumptions
+
+1. Linear relationship between explanatory variables and logit of response variable
+
+   *satistifed: agricultural intensity has a linear relationship with logit of Fat
+   *not satisfied: capture time has a non-linear relationship with logit of Fat (splines improve fit but model with interaction and no splines is still a better fit)
+   *can't do a box-Tidwell test on capture time anyways because of negative values to begin with; I just know separately that splines improve fit (but interaction without splines but with event most improves fit)
+                         E.g., Event * Time versus Event + ns(ts.sunrise, df = 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

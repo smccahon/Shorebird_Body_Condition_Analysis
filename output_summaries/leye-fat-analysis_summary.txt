@@ -1,0 +1,614 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs fat analysis. 
+
+Date Created: 2024-11-26
+Date Modified: 2024-11-26
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 54)
+
+-------------------------------
+
+# Lesser Yellowlegs Modeling ####
+
+## Univariate Analysis: Date ####
+
+m1 <- polr(Fat ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- polr(Fat ~ Julian, data = leye.cs)
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m2 3 101.61       0.00   0.82   0.82 -47.73
+m1 3 104.65       3.04   0.18   1.00 -49.25
+
+# Julian performs better (wt = 0.82)
+# But days into season is more valid (spring 2022 had fat scores almost completely of 0)
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoids ####
+
+# Cannot use concentrations due to extremely skewed data
+
+m1 <- polr(Fat ~ Detection, data = leye.cs)
+m2 <- polr(Fat ~ LogNeonic, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 7  175       0.00   0.54   0.54 -80.4
+m1 7  175       0.28   0.46   1.00 -80.5
+
+# Both perform similarly (log(neonic) performs best)
+# Use detection for consistency
+
+# ---------------------------------------------------------------------------- #
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- polr(Fat ~ PercentAg, data = leye.cs)
+m2 <- polr(Fat ~ PercentAg + I(PercentAg^2), data = leye.cs)
+m3 <- polr(Fat ~ AgIntensity, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 8  179       0.00   0.62   0.62 -81.2
+m3 8  181       2.14   0.21   0.84 -82.3
+m1 7  181       2.71   0.16   1.00 -83.6
+
+# Quadratic relationship performs the best
+
+# ---------------------------------------------------------------------------- #
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- polr(Fat ~ Event * ts.sunrise, data = leye.cs)
+m2 <- polr(Fat ~ Event + ts.sunrise + I(ts.sunrise^2), data = leye.cs)
+m3 <- polr(Fat ~ Event + ts.sunrise, data = leye.cs)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 11  168       0.00   0.64   0.64 -72.5
+m3  9  170       2.26   0.21   0.84 -75.8
+m2 10  171       2.82   0.16   1.00 -75.0
+
+# Model with interaction performs the worst.
+
+# ---------------------------------------------------------------------------- #
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- polr(Fat ~ Event * Detection, data = leye.cs)
+m2 <- polr(Fat ~ Event + Detection, data = leye.cs)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2  9  170       0.00   0.72   0.72 -75.8
+m1 10  172       1.88   0.28   1.00 -75.7
+
+# Model without interaction performs the best.
+
+# ---------------------------------------------------------------------------- #
+
+# INTERACTIONS/TRANSFORMATIONS INCLUDED: Event * Capture Time; PercentAg^2
+
+# ---------------------------------------------------------------------------- #
+
+
+## Single Models ####
+
+m.global <- polr(Fat ~ Sex + Event*ts.sunrise + Julian + Detection + 
+                   PercentAg + I(PercentAg^2), 
+               data = leye.cs)
+
+m.null <- polr(Fat ~ 1, data = leye.cs)
+
+m1 <- polr(Fat ~ Sex, data = leye.cs)
+m2 <- polr(Fat ~ Event, data = leye.cs)
+m3 <- polr(Fat ~ Julian, data = leye.cs)
+m4 <- polr(Fat ~ ts.sunrise, data = leye.cs)
+m5 <- polr(Fat ~ PercentAg + I(PercentAg^2), data = leye.cs)
+m6 <- polr(Fat ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- polr(Fat ~ Sex + Event, data = leye.cs)
+m8 <- polr(Fat ~ Sex + Julian, data = leye.cs)
+m9 <- polr(Fat ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- polr(Fat ~ Sex + PercentAg + I(PercentAg^2), data = leye.cs)
+m11 <- polr(Fat ~ Sex + Detection, data = leye.cs)
+m12 <- polr(Fat ~ Event + Julian, data = leye.cs)
+m13 <- polr(Fat ~ Event * ts.sunrise, data = leye.cs)
+m14 <- polr(Fat ~ Event + PercentAg + I(PercentAg^2), data = leye.cs)
+m15 <- polr(Fat ~ Julian + ts.sunrise, data = leye.cs)
+m16 <- polr(Fat ~ Julian + PercentAg + I(PercentAg^2), data = leye.cs)
+m17 <- polr(Fat ~ Julian + Detection, data = leye.cs)
+m18 <- polr(Fat ~ ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m19 <- polr(Fat ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- polr(Fat ~ PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- polr(Fat ~ Sex + Event + Julian, data = leye.cs)
+m22 <- polr(Fat ~ Sex + Event * ts.sunrise, data = leye.cs)
+m23 <- polr(Fat ~ Sex + Event + PercentAg + I(PercentAg^2), data = leye.cs)
+m24 <- polr(Fat ~ Sex + Event + Detection, data = leye.cs)
+m25 <- polr(Fat ~ Sex + Julian + ts.sunrise, data = leye.cs)
+m26 <- polr(Fat ~ Sex + Julian + PercentAg + I(PercentAg^2), data = leye.cs)
+m27 <- polr(Fat ~ Sex + Julian + Detection, data = leye.cs)
+m28 <- polr(Fat ~ Sex + ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m29 <- polr(Fat ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- polr(Fat ~ Sex + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m31 <- polr(Fat ~ Event + Julian + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m32 <- polr(Fat ~ Event + Julian + PercentAg + I(PercentAg^2), data = leye.cs)
+m33 <- polr(Fat ~ Event + Julian + Detection, data = leye.cs)
+m34 <- polr(Fat ~ Event * ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m35 <- polr(Fat ~ Event * ts.sunrise + Detection, data = leye.cs)
+m36 <- polr(Fat ~ Event + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m37 <- polr(Fat ~ Julian + ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m38 <- polr(Fat ~ Julian + ts.sunrise + Detection, data = leye.cs)
+m39 <- polr(Fat ~ Julian + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m40 <- polr(Fat ~ ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + Event*ts.sunrise, data = leye.cs)
+m42 <- polr(Fat ~ Sex + Event + Julian + PercentAg + I(PercentAg^2), data = leye.cs)
+m43 <- polr(Fat ~ Sex + Event + Julian + Detection, data = leye.cs)
+m44 <- polr(Fat ~ Sex + Event * ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m45 <- polr(Fat ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
+m46 <- polr(Fat ~ Sex + Event + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m47 <- polr(Fat ~ Sex + Julian + ts.sunrise + PercentAg + I(PercentAg^2), data = leye.cs)
+m48 <- polr(Fat ~ Sex + Julian + ts.sunrise + Detection, data = leye.cs)
+m49 <- polr(Fat ~ Sex + Julian + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m50 <- polr(Fat ~ Sex + ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m51 <- polr(Fat ~ Event + Julian + ts.sunrise + PercentAg + I(PercentAg^2) + Event*ts.sunrise, data = leye.cs)
+m52 <- polr(Fat ~ Event + Julian + ts.sunrise + Detection + Event*ts.sunrise, data = leye.cs)
+m53 <- polr(Fat ~ Event + Julian + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m54 <- polr(Fat ~ Event * ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m55 <- polr(Fat ~ Julian + ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + PercentAg + I(PercentAg^2) + Event * ts.sunrise, data = leye.cs)
+m57 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m58 <- polr(Fat ~ Sex + Event + Julian + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m59 <- polr(Fat ~ Sex + Event * ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m60 <- polr(Fat ~ Sex + Julian + ts.sunrise + PercentAg + I(PercentAg^2) + Detection, data = leye.cs)
+m61 <- polr(Fat ~ Event + Julian + ts.sunrise + PercentAg + I(PercentAg^2) + Detection + Event*ts.sunrise, data = leye.cs)
+
+# ---------------------------------------------------------------------------- #
+
+### AIC Model Selection ####
+
+Model selection based on AICc(shortened and standardized):
+
+          K AICc Delta_AICc AICcWt Cum.Wt    LL
+m16       9  160       0.00   0.23   0.23 -70.6
+m26      10  161       1.30   0.12   0.35 -70.2
+m37      10  162       1.96   0.09   0.43 -70.5
+m39      10  162       2.11   0.08   0.51 -70.6
+.
+.
+.
+
+
+# ---------------------------------------------------------------------------- #
+
+# Top Model Summaries ####
+
+1. Fat ~ Julian + Agricultural Intensity (continuous) (m16)
+
+Coefficients:
+                Value Std. Error t value
+Julian          1.448      0.367    3.95
+PercentAg      -0.595      0.382   -1.56
+I(PercentAg^2) -0.667      0.246   -2.71
+
+Intercepts:
+    Value   Std. Error t value
+0|1  -1.264   0.452     -2.794
+1|2  -0.391   0.401     -0.975
+2|3   0.219   0.383      0.573
+3|4   1.574   0.440      3.579
+4|5   3.368   0.766      4.398
+5|6  15.335 276.476      0.055
+
+Residual Deviance: 141.14 
+AIC: 159.14 
+
+                2.5 % 97.5 %
+Julian          0.787  2.258
+PercentAg      -1.406  0.123
+I(PercentAg^2) -1.186 -0.209
+
+*Conclusion: Julian date and agricultural intensity have a significant impact on fat.
+
+
+2. Fat ~ Sex + Julian + Agricultural Intensity (continuous)
+
+Coefficients:
+                Value Std. Error t value
+SexFemale      -0.501      0.559  -0.896
+Julian          1.480      0.368   4.025
+PercentAg      -0.533      0.394  -1.354
+I(PercentAg^2) -0.654      0.248  -2.639
+
+Intercepts:
+    Value  Std. Error t value
+0|1 -1.500  0.527     -2.849 
+1|2 -0.623  0.479     -1.299 
+2|3  0.007  0.451      0.016 
+3|4  1.401  0.479      2.928 
+4|5  3.204  0.785      4.080 
+
+Residual Deviance: 140.32 
+AIC: 158.32 
+
+                2.5 % 97.5 %
+SexFemale      -1.623  0.583
+Julian          0.816  2.286
+PercentAg      -1.364  0.208
+I(PercentAg^2) -1.177 -0.193
+
+*Conclusion: Julian date and agricultural intensity have a significant impact on fat.
+
+
+# ---------------------------------------------------------------------------- #
+
+## RERUN ALL MODELS WITH CATEGORICAL PREDICTOR OF AGRICULTURAL INTENSITY INSTEAD ####
+
+
+## Single Models ####
+
+m.global <- polr(Fat ~ Sex + Event*ts.sunrise + Julian + Detection + 
+                   AgIntensity, 
+                 data = leye.cs)
+
+m.null <- polr(Fat ~ 1, data = leye.cs)
+
+m1 <- polr(Fat ~ Sex, data = leye.cs)
+m2 <- polr(Fat ~ Event, data = leye.cs)
+m3 <- polr(Fat ~ Julian, data = leye.cs)
+m4 <- polr(Fat ~ ts.sunrise, data = leye.cs)
+m5 <- polr(Fat ~ AgIntensity, data = leye.cs)
+m6 <- polr(Fat ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- polr(Fat ~ Sex + Event, data = leye.cs)
+m8 <- polr(Fat ~ Sex + Julian, data = leye.cs)
+m9 <- polr(Fat ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- polr(Fat ~ Sex + AgIntensity, data = leye.cs)
+m11 <- polr(Fat ~ Sex + Detection, data = leye.cs)
+m12 <- polr(Fat ~ Event + Julian, data = leye.cs)
+m13 <- polr(Fat ~ Event * ts.sunrise, data = leye.cs)
+m14 <- polr(Fat ~ Event + AgIntensity, data = leye.cs)
+m15 <- polr(Fat ~ Julian + ts.sunrise, data = leye.cs)
+m16 <- polr(Fat ~ Julian + AgIntensity, data = leye.cs)
+m17 <- polr(Fat ~ Julian + Detection, data = leye.cs)
+m18 <- polr(Fat ~ ts.sunrise + AgIntensity, data = leye.cs)
+m19 <- polr(Fat ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- polr(Fat ~ AgIntensity + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- polr(Fat ~ Sex + Event + Julian, data = leye.cs)
+m22 <- polr(Fat ~ Sex + Event * ts.sunrise, data = leye.cs)
+m23 <- polr(Fat ~ Sex + Event + AgIntensity, data = leye.cs)
+m24 <- polr(Fat ~ Sex + Event + Detection, data = leye.cs)
+m25 <- polr(Fat ~ Sex + Julian + ts.sunrise, data = leye.cs)
+m26 <- polr(Fat ~ Sex + Julian + AgIntensity, data = leye.cs)
+m27 <- polr(Fat ~ Sex + Julian + Detection, data = leye.cs)
+m28 <- polr(Fat ~ Sex + ts.sunrise + AgIntensity, data = leye.cs)
+m29 <- polr(Fat ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- polr(Fat ~ Sex + AgIntensity + Detection, data = leye.cs)
+m31 <- polr(Fat ~ Event + Julian + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m32 <- polr(Fat ~ Event + Julian + AgIntensity, data = leye.cs)
+m33 <- polr(Fat ~ Event + Julian + Detection, data = leye.cs)
+m34 <- polr(Fat ~ Event * ts.sunrise + AgIntensity, data = leye.cs)
+m35 <- polr(Fat ~ Event * ts.sunrise + Detection, data = leye.cs)
+m36 <- polr(Fat ~ Event + AgIntensity + Detection, data = leye.cs)
+m37 <- polr(Fat ~ Julian + ts.sunrise + AgIntensity, data = leye.cs)
+m38 <- polr(Fat ~ Julian + ts.sunrise + Detection, data = leye.cs)
+m39 <- polr(Fat ~ Julian + AgIntensity + Detection, data = leye.cs)
+m40 <- polr(Fat ~ ts.sunrise + AgIntensity + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + Event*ts.sunrise, data = leye.cs)
+m42 <- polr(Fat ~ Sex + Event + Julian + AgIntensity, data = leye.cs)
+m43 <- polr(Fat ~ Sex + Event + Julian + Detection, data = leye.cs)
+m44 <- polr(Fat ~ Sex + Event * ts.sunrise + AgIntensity, data = leye.cs)
+m45 <- polr(Fat ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
+m46 <- polr(Fat ~ Sex + Event + AgIntensity + Detection, data = leye.cs)
+m47 <- polr(Fat ~ Sex + Julian + ts.sunrise + AgIntensity, data = leye.cs)
+m48 <- polr(Fat ~ Sex + Julian + ts.sunrise + Detection, data = leye.cs)
+m49 <- polr(Fat ~ Sex + Julian + AgIntensity + Detection, data = leye.cs)
+m50 <- polr(Fat ~ Sex + ts.sunrise + AgIntensity + Detection, data = leye.cs)
+m51 <- polr(Fat ~ Event + Julian + ts.sunrise + AgIntensity + Event*ts.sunrise, data = leye.cs)
+m52 <- polr(Fat ~ Event + Julian + ts.sunrise + Detection + Event*ts.sunrise, data = leye.cs)
+m53 <- polr(Fat ~ Event + Julian + AgIntensity + Detection, data = leye.cs)
+m54 <- polr(Fat ~ Event * ts.sunrise + AgIntensity + Detection, data = leye.cs)
+m55 <- polr(Fat ~ Julian + ts.sunrise + AgIntensity + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + AgIntensity + Event * ts.sunrise, data = leye.cs)
+m57 <- polr(Fat ~ Sex + Event + Julian + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m58 <- polr(Fat ~ Sex + Event + Julian + AgIntensity + Detection, data = leye.cs)
+m59 <- polr(Fat ~ Sex + Event * ts.sunrise + AgIntensity + Detection, data = leye.cs)
+m60 <- polr(Fat ~ Sex + Julian + ts.sunrise + AgIntensity + Detection, data = leye.cs)
+m61 <- polr(Fat ~ Event + Julian + ts.sunrise + AgIntensity + Detection + Event*ts.sunrise, data = leye.cs)
+
+# AIC MODEL SELECTION
+
+Model selection based on AICc (shortened and standardized):
+
+          K AICc Delta_AICc AICcWt Cum.Wt    LL
+m16       8  158       0.00   0.25   0.25 -70.5
+m39       9  159       1.91   0.09   0.34 -70.4
+m37       9  160       2.07   0.09   0.43 -70.5
+.
+.
+.
+
+-------------------------------------------
+
+# TOP MODEL SUMMARIES
+
+1. Fat ~ Julian + Agricultural Intensity (categorical)
+
+Coefficients:
+                     Value Std. Error t value
+Julian               1.558      0.389   4.004
+AgIntensityModerate  0.455      0.648   0.703
+AgIntensityHigh     -1.678      0.852  -1.970
+
+Intercepts:
+    Value  Std. Error t value
+0|1 -0.630  0.543     -1.160 
+1|2  0.151  0.530      0.284 
+2|3  0.729  0.537      1.357 
+3|4  2.193  0.631      3.478 
+4|5  4.070  0.911      4.467 
+
+Residual Deviance: 141.07 
+AIC: 157.07 
+
+                      2.5 %  97.5 %
+Julian               0.0201  0.0564
+AgIntensityModerate -0.8230  1.7409
+AgIntensityHigh     -3.4284 -0.0486
+
+*Conclusion: Julian date and agricultural intensity have a significant impact on fat.
+
+2. Fat ~ Julian + Detection + Agricultural Intensity (categorical)
+
+Coefficients:
+                        Value Std. Error t value
+Julian                  1.658      0.448   3.703
+AgIntensityModerate     0.454      0.648   0.700
+AgIntensityHigh        -1.745      0.867  -2.013
+DetectionNon-detection -0.302      0.669  -0.452
+
+Intercepts:
+    Value  Std. Error t value
+0|1 -0.818  0.685     -1.194 
+1|2 -0.043  0.682     -0.063 
+2|3  0.532  0.691      0.770 
+3|4  2.006  0.754      2.661 
+4|5  3.913  0.975      4.012 
+
+Residual Deviance: 140.86 
+AIC: 158.86 
+
+                        2.5 %  97.5 %
+Julian                  0.833  2.6329
+AgIntensityModerate    -0.827  1.7407
+AgIntensityHigh        -3.529 -0.0888
+DetectionNon-detection -1.622  1.0271
+
+*Conclusion: Julian date and agricultural intensity have a significant impact on fat. Detection has no impact on fat.
+
+HOW DO I GET A GOOD GRAPH?!?!?!??!?!?!??!
+
+-------------------------------------------
+
+## Noticed sample sizes are too small! Rerun models combining fat scores 0&1, 2&3, and 4&5
+
+
+## Univariate Analysis: Date ####
+
+m1 <- polr(Fat.G ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- polr(Fat.G ~ Julian, data = leye.cs)
+
+model_names <- paste0("m", 1:2)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3 89.5       0.00   0.97   0.97 -41.7
+m1 3 96.7       7.14   0.03   1.00 -45.2
+
+# Julian date performs way better
+
+-------------------------------------------
+
+## Univariate Analysis: Neonicotinoids ####
+
+# Cannot use concentrations due to extremely skewed data
+
+m1 <- polr(Fat.G ~ Detection, data = leye.cs)
+m2 <- polr(Fat.G ~ LogNeonic, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3  104       0.00   0.62   0.62 -49.1
+m1 3  105       1.01   0.38   1.00 -49.6
+
+# Log neonic performs better but use detection for consistency
+
+-------------------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- polr(Fat.G ~ PercentAg, data = leye.cs)
+m2 <- polr(Fat.G ~ PercentAg + I(PercentAg^2), data = leye.cs)
+m3 <- polr(Fat.G ~ AgIntensity, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 4  107       0.00   0.82   0.82 -49.5
+m1 3  111       3.95   0.11   0.94 -52.6
+m3 4  113       5.23   0.06   1.00 -52.2
+
+# Quadratic relationship performs best
+
+-------------------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- polr(Fat.G ~ Event * ts.sunrise, data = leye.cs)
+m2 <- polr(Fat.G ~ Event + ts.sunrise + I(ts.sunrise^2), data = leye.cs)
+m3 <- polr(Fat.G ~ Event + ts.sunrise, data = leye.cs)
+
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 7 96.8       0.00   0.44   0.44 -41.0
+m2 6 97.5       0.74   0.31   0.75 -42.5
+m3 5 97.9       1.15   0.25   1.00 -43.8
+
+# Model with interaction performs best
+
+-------------------------------------------
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- polr(Fat.G ~ Event * Detection, data = leye.cs)
+m2 <- polr(Fat.G ~ Event + Detection, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 5 97.9        0.0   0.72   0.72 -43.8
+m1 6 99.8        1.9   0.28   1.00 -43.6
+
+# Model without interaction performs best
+
+-------------------------------------------
+
+Model selection based on AICc (shortened and standardized):
+
+          K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m16       5  86.5       0.00   0.23   0.23 -38.0
+m26       6  88.3       1.85   0.09   0.33 -37.9
+m37       6  88.4       1.88   0.09   0.42 -37.9
+m39       6  88.6       2.15   0.08   0.50 -38.0
+.
+.
+.
+
+-------------------------------------------
+
+# Top Model Summaries
+
+1. Fat ~ Agricultural Intensity (continuous) + Julian
+
+
+Call:
+polr(formula = Fat.G ~ Julian + PercentAg + I(PercentAg^2), data = leye.cs)
+
+Coefficients:
+                Value Std. Error t value
+Julian          2.115      0.717    2.95
+PercentAg      -0.717      0.539   -1.33
+I(PercentAg^2) -0.791      0.345   -2.30
+
+Intercepts:
+              Value  Std. Error t value
+Low|Moderate  -0.149  0.527     -0.283 
+Moderate|High  1.954  0.596      3.281 
+
+Residual Deviance: 76.10 
+AIC: 86.10 
+
+               2.5 % 97.5 %
+Julian          1.02  3.875
+PercentAg      -1.92  0.257
+I(PercentAg^2) -1.60 -0.195
+
+# Conclusion: Julian Date and quadratic relationship with agricultural intensity have a significant impact on Fat. 
+
+
+-------------------------------------------
+
+# Try using agricultural intensity as a covariate
+
+Model selection based on AICc:
+
+          K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m16       5  86.7       0.00   0.28   0.28 -38.1
+m37       6  88.8       2.12   0.10   0.38 -38.1
+.
+.
+.
+
+1. Fat ~ Julian + Agricultural Intensity (categorical)
+
+Call:
+polr(formula = Fat.G ~ Julian + AgIntensity, data = leye.cs)
+
+Coefficients:
+                     Value Std. Error t value
+Julian               3.207      1.183   2.711
+AgIntensityModerate -0.629      0.981  -0.641
+AgIntensityHigh     -2.574      1.223  -2.105
+
+Intercepts:
+              Value  Std. Error t value
+Low|Moderate   0.208  0.558      0.372 
+Moderate|High  2.383  0.701      3.397 
+
+Residual Deviance: 76.31 
+AIC: 86.31 
+
+
+                    2.5 % 97.5 %
+Julian               1.41   5.80
+AgIntensityModerate -2.64   1.19
+AgIntensityHigh     -5.21  -0.39
+
+# Conclusion: Julian Date and agricultural intensity have a significant impact on Fat. 
+
+
+-------------------------------------------
+
+# Plot!
+
+I honestly don't think these models are valid?? Too small of sample sizes for each fat category. When I plot raw data I'm not seeing any impacts.
+
+ISSUES WITH ADDING STANDARD ERRORS!!! WAITING FOR TIM'S RESPONSE!
+
+I want to investigate the impact of ag intensity on fat...but not sure if it makes sense or if sample size is too small!
+
+LEYE fat score and tallies:
+ 0  1  2  3  4  5 
+22  7  5 11  7  2 
+
+PercentAg Categories:
+     Q1 Median    Q3
+1 0.396  0.462 0.541
+
+
+
+
+
+
+

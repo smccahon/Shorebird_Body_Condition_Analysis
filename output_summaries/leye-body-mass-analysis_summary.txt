@@ -1,0 +1,359 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs body mass analysis. 
+
+Date Created: 2024-11-11
+Date Modified: 2024-12-09
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 54)
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- lm(Mass ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- lm(Mass ~ Julian, data = leye.cs)
+
+model_names <- paste0("m", 1:2)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m1 3 153.34       0.00   0.83   0.83 -73.43
+m2 3 156.50       3.16   0.17   1.00 -75.01
+
+**Date into migration season performs significantly better than Julian date
+
+# ---------------------------------------------------------------------------- #
+
+## Univariate Analysis: Neonicotinoids ####
+
+m1 <- lm(Mass ~ Detection, data = leye.cs)
+m2 <- lm(Mass ~ OverallNeonic, data = leye.cs)
+m3 <- lm(Mass ~ LogNeonic, data = leye.cs)
+
+model_names <- paste0("m", 1:3)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m3 3  156       0.00   0.45   0.45 -74.8
+m1 3  156       0.06   0.43   0.88 -74.8
+m2 3  159       2.63   0.12   1.00 -76.1
+
+**Detection and Log transformation of concentrations perform significantly better.
+**Include detection only.
+# ---------------------------------------------------------------------------- #
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- lm(Mass ~ AgCategory, data = leye.cs)
+m2 <- lm(Mass ~ PercentAg, data = leye.cs)
+m3 <- lm(Mass ~ LogAg, data = leye.cs)
+m4 <- lm(Mass ~ PercentAg + I(PercentAg^2), data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3  159       0.00   0.37   0.37 -76.1
+m3 3  159       0.06   0.36   0.72 -76.1
+m4 4  160       1.58   0.17   0.89 -75.7
+m1 4  161       2.40   0.11   1.00 -76.1
+
+# PercentAg as a linear, continuous variable performs the best (no transformation)
+
+# ---------------------------------------------------------------------------- #
+
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lm(Mass ~ Event * ts.sunrise, data = leye.cs)
+m2 <- lm(Mass ~ Event + I(ts.sunrise^2), data = leye.cs)
+m3 <- lm(Mass ~ Event + ts.sunrise, data = leye.cs)
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m1 7 136.41       0.00   0.99   0.99 -59.99
+m2 5 146.91      10.50   0.01   1.00 -67.83
+m3 5 148.54      12.13   0.00   1.00 -68.65
+
+# Model with interaction by far performs the best.
+
+# ---------------------------------------------------------------------------- #
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- lm(Mass ~ Event * Detection, data = leye.cs)
+m2 <- lm(Mass ~ Event + Detection, data = leye.cs)
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m2 5 148.22       0.00   0.67   0.67 -68.49
+m1 6 149.60       1.38   0.33   1.00 -67.91
+
+# Model without interaction performs significantly better
+
+# ---------------------------------------------------------------------------- #
+
+## Single Models ####
+
+m.global <- lm(Mass ~ Sex + Event*ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+                 data = leye.cs)
+
+
+m.null <- lm(Mass ~ 1, data = leye.cs)
+
+m1 <- lm(Mass ~ Sex, data = leye.cs)
+m2 <- lm(Mass ~ Event, data = leye.cs)
+m3 <- lm(Mass ~ DaysIntoSeason_S, data = leye.cs)
+m4 <- lm(Mass ~ ts.sunrise, data = leye.cs)
+m5 <- lm(Mass ~ PercentAg, data = leye.cs)
+m6 <- lm(Mass ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- lm(Mass ~ Sex + Event, data = leye.cs)
+m8 <- lm(Mass ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m9 <- lm(Mass ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- lm(Mass ~ Sex + PercentAg, data = leye.cs)
+m11 <- lm(Mass ~ Sex + Detection, data = leye.cs)
+m12 <- lm(Mass ~ Event + DaysIntoSeason_S, data = leye.cs)
+m13 <- lm(Mass ~ Event * ts.sunrise, data = leye.cs)
+m14 <- lm(Mass ~ Event + PercentAg, data = leye.cs)
+m15 <- lm(Mass ~ Event + Detection, data = leye.cs)
+m16 <- lm(Mass ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m17 <- lm(Mass ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m18 <- lm(Mass ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m19 <- lm(Mass ~ ts.sunrise + PercentAg, data = leye.cs)
+m20 <- lm(Mass ~ ts.sunrise + Detection, data = leye.cs)
+m21 <- lm(Mass ~ PercentAg + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m22 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m23 <- lm(Mass ~ Sex + Event * ts.sunrise, data = leye.cs)
+m24 <- lm(Mass ~ Sex + Event + PercentAg, data = leye.cs)
+m25 <- lm(Mass ~ Sex + Event + Detection, data = leye.cs)
+m26 <- lm(Mass ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m27 <- lm(Mass ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m28 <- lm(Mass ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m29 <- lm(Mass ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m30 <- lm(Mass ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m31 <- lm(Mass ~ Sex + PercentAg + Detection, data = leye.cs)
+m32 <- lm(Mass ~ Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m33 <- lm(Mass ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m34 <- lm(Mass ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m35 <- lm(Mass ~ Event * ts.sunrise + PercentAg, data = leye.cs)
+m36 <- lm(Mass ~ Event * ts.sunrise + Detection, data = leye.cs)
+m37 <- lm(Mass ~ Event + PercentAg + Detection, data = leye.cs)
+m38 <- lm(Mass ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m39 <- lm(Mass ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m40 <- lm(Mass ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m41 <- lm(Mass ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m42 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event*ts.sunrise, data = leye.cs)
+m43 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m44 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m45 <- lm(Mass ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs)
+m46 <- lm(Mass ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
+m47 <- lm(Mass ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m48 <- lm(Mass ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m49 <- lm(Mass ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m50 <- lm(Mass ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m51 <- lm(Mass ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m52 <- lm(Mass ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event*ts.sunrise, data = leye.cs)
+m53 <- lm(Mass ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event*ts.sunrise, data = leye.cs)
+m54 <- lm(Mass ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m55 <- lm(Mass ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m56 <- lm(Mass ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+ 
+### Five additive combinations ####
+
+m57 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
+m58 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m59 <- lm(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m60 <- lm(Mass ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m61 <- lm(Mass ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m62 <- lm(Mass ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event*ts.sunrise, data = leye.cs)
+
+# ---------------------------------------------------------------------------- #
+
+Model selection based on AICc:
+
+          K AICc Delta_AICc AICcWt Cum.Wt    LL
+m13       7  136       0.00   0.25   0.25 -60.0
+m36       8  137       0.62   0.18   0.43 -58.9
+m35       8  138       1.39   0.12   0.56 -59.3
+m32       8  139       2.46   0.07   0.63 -59.8
+m55       9  139       2.57   0.07   0.70 -58.5
+m23       8  139       2.67   0.07   0.77 -59.9
+m53       9  140       3.15   0.05   0.82 -58.7
+m46       9  140       3.49   0.04   0.86 -58.9
+m45       9  141       4.26   0.03   0.89 -59.3
+m52       9  141       4.26   0.03   0.92 -59.3
+m42       9  142       5.25   0.02   0.94 -59.8
+m60      10  142       5.60   0.02   0.96 -58.5
+m62      10  142       5.60   0.02   0.97 -58.5
+m58      10  143       6.15   0.01   0.98 -58.7
+m57      10  144       7.26   0.01   0.99 -59.3
+m.global 11  145       8.76   0.00   0.99 -58.5
+m2        4  146       9.71   0.00   1.00 -68.7
+m14       5  148      11.38   0.00   1.00 -68.3
+m15       5  148      11.81   0.00   1.00 -68.5
+m7        5  148      11.89   0.00   1.00 -68.5
+m12       5  148      12.05   0.00   1.00 -68.6
+m37       6  150      13.71   0.00   1.00 -68.2
+m24       6  150      13.75   0.00   1.00 -68.2
+m33       6  150      13.85   0.00   1.00 -68.2
+m25       6  151      14.14   0.00   1.00 -68.4
+m34       6  151      14.24   0.00   1.00 -68.4
+m22       6  151      14.33   0.00   1.00 -68.5
+m17       4  152      15.49   0.00   1.00 -71.5
+m47       7  153      16.22   0.00   1.00 -68.1
+m54       7  153      16.32   0.00   1.00 -68.2
+m43       7  153      16.35   0.00   1.00 -68.2
+m44       7  153      16.69   0.00   1.00 -68.3
+m3        3  153      16.93   0.00   1.00 -73.4
+m27       5  154      17.61   0.00   1.00 -71.4
+m40       5  154      17.70   0.00   1.00 -71.4
+m38       5  154      17.72   0.00   1.00 -71.4
+m8        4  155      18.42   0.00   1.00 -73.0
+m18       4  155      18.64   0.00   1.00 -73.1
+m16       4  155      18.92   0.00   1.00 -73.3
+m59       8  155      18.96   0.00   1.00 -68.1
+m6        3  156      19.62   0.00   1.00 -74.8
+m50       6  156      19.90   0.00   1.00 -71.3
+m48       6  156      19.98   0.00   1.00 -71.3
+m56       6  156      20.04   0.00   1.00 -71.3
+m.null    2  156      20.06   0.00   1.00 -76.1
+m28       5  157      20.23   0.00   1.00 -72.7
+m26       5  157      20.59   0.00   1.00 -72.9
+m39       5  157      20.74   0.00   1.00 -73.0
+m11       4  158      21.09   0.00   1.00 -74.3
+m1        3  158      21.42   0.00   1.00 -75.7
+m20       4  158      21.58   0.00   1.00 -74.6
+m21       4  158      21.74   0.00   1.00 -74.7
+m4        3  158      21.87   0.00   1.00 -75.9
+m5        3  159      22.20   0.00   1.00 -76.1
+m61       7  159      22.39   0.00   1.00 -71.2
+m49       6  159      22.52   0.00   1.00 -72.6
+m30       5  160      23.23   0.00   1.00 -74.2
+m31       5  160      23.41   0.00   1.00 -74.3
+m9        4  160      23.42   0.00   1.00 -75.5
+m10       4  160      23.73   0.00   1.00 -75.7
+m41       5  160      23.82   0.00   1.00 -74.5
+m19       4  161      24.12   0.00   1.00 -75.9
+m51       6  162      25.67   0.00   1.00 -74.2
+m29       5  162      25.83   0.00   1.00 -75.5
+
+# ---------------------------------------------------------------------------- #
+
+# Top Model Summaries
+
+1. Mass ~ Event * Time
+
+                            Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)                    1.425      0.285   4.999 8.10e-06  0.852  1.998
+EventSpring 2022              -1.769      0.485  -3.647 6.52e-04 -2.745 -0.794
+EventFall 2023                -1.821      0.319  -5.715 6.81e-07 -2.462 -1.180
+ts.sunrise                     1.468      0.407   3.603 7.45e-04  0.649  2.287
+EventSpring 2022:ts.sunrise   -0.123      0.865  -0.142 8.88e-01 -1.863  1.617
+EventFall 2023:ts.sunrise     -1.638      0.424  -3.861 3.37e-04 -2.491 -0.785
+
+# Conclusion: The effect of capture time on mass in fall 2023 is significantly different compared to other seasons. This is because birds in fall 2023 were captured both later and earlier in the day when body mass is likely to be lower. 
+
+Residual standard error: 0.779 on 48 degrees of freedom
+Multiple R-squared:  0.45,	Adjusted R-squared:  0.392 
+F-statistic: 7.85 on 5 and 48 DF,  p-value: 1.84e-05
+
+
+2. Mass ~ Event * Capture Time + Detection (m36)
+
+                            Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)                    1.693      0.343   4.937 1.04e-05  1.003  2.384
+EventSpring 2022              -2.038      0.519  -3.930 2.78e-04 -3.081 -0.995
+EventFall 2023                -1.780      0.317  -5.614 1.03e-06 -2.418 -1.142
+ts.sunrise                     1.599      0.415   3.856 3.49e-04  0.765  2.434
+DetectionNon-detection        -0.388      0.281  -1.380 1.74e-01 -0.954  0.178
+EventSpring 2022:ts.sunrise   -0.254      0.863  -0.294 7.70e-01 -1.989  1.482
+EventFall 2023:ts.sunrise     -1.753      0.429  -4.092 1.67e-04 -2.615 -0.891
+
+# Conclusion: The effect of capture time on mass in fall 2023 is significantly different compared to other seasons. This is because birds in fall 2023 were captured both later and earlier in the day when body mass is likely to be lower. The impact of detection on body mass is not significant.
+
+Residual standard error: 0.772 on 47 degrees of freedom
+Multiple R-squared:  0.471,	Adjusted R-squared:  0.404 
+F-statistic: 6.98 on 6 and 47 DF,  p-value: 2.39e-05
+
+3. Mass ~ Event * Capture Time + PercentAg
+
+                           Estimate Std. Error t value Pr(>|t|)  2.5 % 97.5 %
+(Intercept)                   1.4149      0.285   4.973 9.23e-06  0.843  1.987
+EventSpring 2022             -1.6920      0.489  -3.459 1.16e-03 -2.676 -0.708
+EventFall 2023               -1.8350      0.318  -5.767 6.05e-07 -2.475 -1.195
+ts.sunrise                    1.4728      0.407   3.622 7.14e-04  0.655  2.291
+PercentAg                     0.1244      0.113   1.099 2.77e-01 -0.103  0.352
+EventSpring 2022:ts.sunrise  -0.0983      0.864  -0.114 9.10e-01 -1.836  1.640
+EventFall 2023:ts.sunrise    -1.6455      0.423  -3.887 3.17e-04 -2.497 -0.794
+
+# The effect of agricultural intensity on mass is not significant.
+
+Residual standard error: 0.778 on 47 degrees of freedom
+Multiple R-squared:  0.464,	Adjusted R-squared:  0.395 
+F-statistic: 6.77 on 6 and 47 DF,  p-value: 3.25e-05
+
+# ---------------------------------------------------------------------------- #
+
+# Model Assumptions: 
+
+1. Mass ~ Event * Time 
+2. Mass ~ Event * Time + Detection
+
+No significant deviations from normality. Homoscedasticity assumption met. 4 influential points impact analysis (21, 27, 38, 128). Omitting them makes interaction term (Event * Time) insignificant.
+
+Conclusion: Retain full dataset given only the significance (not the inference) changes. 
+
+# ---------------------------------------------------------------------------- #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

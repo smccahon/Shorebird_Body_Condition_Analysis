@@ -1,0 +1,637 @@
+This file serves as supportive documentation to Shelby McCahon's All Species metabolite analysis. 
+
+Date Modified: 2024-12-09
+
+-------------------------------
+
+Species tested (n = 8 species; n = 85 birds): 
+Lesser Yellowlegs (n = 29)
+Least Sandpiper (n = 6)
+Semipalmated Sandpiper (n = 7)
+Wilson's Phalarope (n = 16)
+Pectoral Sandpiper (n = 8)
+Killdeer (n = 9)
+Willet (n = 4)
+Long-billed Dowitcher (n = 6)
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- lmer(PC1 ~ DaysIntoSeason_S + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ Julian + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2 4  257       0.00   0.57   0.57 -124
+m1 4  258       0.54   0.43   1.00 -125
+
+# Both perform similarily; use date into season for consistency
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoid ####
+
+m1 <- lmer(PC1 ~ OverallNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ LogNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(PC1 ~ Detection + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m3 4  257       0.00   0.41   0.41 -124
+m2 4  257       0.03   0.40   0.81 -124
+m1 4  258       1.48   0.19   1.00 -125
+
+# Detection and LogNeonic perform similarily
+# Log transformation is necessary to address issues of homoscedasticity and normality
+# Detection makes sense biologically
+# Just use detection for consistency with other models
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lmer(PC1 ~ Event * ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ Event + I(ts.sunrise^2) + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(PC1 ~ Event + ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt   LL
+m3  7  258       0.00   0.77   0.77 -121
+m2  7  261       2.72   0.20   0.96 -123
+m1 10  264       6.09   0.04   1.00 -121
+
+# Simple model without interaction performs the best.
+
+-------------------------------
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- lmer(PC1 ~ Event * Detection + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ Event + Detection + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2 7  260       0.00   0.91   0.91 -122
+m1 9  264       4.57   0.09   1.00 -122
+
+# Model without interaction performs significantly better
+
+-------------------------------
+
+
+## Interaction Analysis: Date * Migratory Status ####
+
+m1 <- lmer(PC1 ~ DaysIntoSeason_S + MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ DaysIntoSeason_S * MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2 6  260       0.00   0.52   0.52 -123
+m1 5  260       0.19   0.48   1.00 -125
+
+# Model with interaction performs slightly better (wt = 52%), but given they're so close drop the interaction 
+
+-------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- lmer(PC1 ~ PercentAg + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ PercentAg + I(PercentAg^2) + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(PC1 ~ AgCategory + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m3 5  253       0.00   0.81   0.81 -121
+m2 5  257       3.61   0.13   0.94 -123
+m1 4  258       5.23   0.06   1.00 -125
+
+# Agricultural intensity as a category performs best
+
+-------------------------------
+
+# INTERACTIONS INCLUDED: NONE; Agricultural intensity as a categorical variable
+
+-------------------------------
+
+m.global <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + 
+                   MigStatus + AgCategory + Detection + (1 | Species), 
+                   REML = FALSE, data = birds.cs)
+
+m.null <- lmer(PC1 ~ 1 + (1|Species), data = birds.cs, REML = FALSE)
+
+## Single Covariate Models ####
+
+m1 <- lmer(PC1 ~ Sex + (1|Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(PC1 ~ Event + (1|Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(PC1 ~ ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m4 <- lmer(PC1 ~ DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m5 <- lmer(PC1 ~ MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m6 <- lmer(PC1 ~ AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m7 <- lmer(PC1 ~ Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+##  Additive Models ####
+
+### Two additive combinations ####
+
+m8 <- lmer(PC1 ~ Sex + Event + (1|Species), data = birds.cs, REML = FALSE)
+m9 <- lmer(PC1 ~ Sex + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m10 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m11 <- lmer(PC1 ~ Sex + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m12 <- lmer(PC1 ~ Sex + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m13 <- lmer(PC1 ~ Sex + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m14 <- lmer(PC1 ~ Event + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m15 <- lmer(PC1 ~ Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m16 <- lmer(PC1 ~ Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m17 <- lmer(PC1 ~ Event + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m18 <- lmer(PC1 ~ Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m19 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m20 <- lmer(PC1 ~ ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m21 <- lmer(PC1 ~ ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m22 <- lmer(PC1 ~ ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m23 <- lmer(PC1 ~ DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m24 <- lmer(PC1 ~ DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m25 <- lmer(PC1 ~ DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m26 <- lmer(PC1 ~ MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m27 <- lmer(PC1 ~ MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m28 <- lmer(PC1 ~ AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Three Additive Combinations ####
+
+m29 <- lmer(PC1 ~ Sex + Event + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m30 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m31 <- lmer(PC1 ~ Sex + Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m32 <- lmer(PC1 ~ Sex + Event + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m33 <- lmer(PC1 ~ Sex + Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m34 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m35 <- lmer(PC1 ~ Sex + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m36 <- lmer(PC1 ~ Sex + ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m37 <- lmer(PC1 ~ Sex + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m38 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m39 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m40 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m41 <- lmer(PC1 ~ Sex + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m42 <- lmer(PC1 ~ Sex + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m43 <- lmer(PC1 ~ Sex + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m44 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m45 <- lmer(PC1 ~ Event + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m46 <- lmer(PC1 ~ Event + ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m47 <- lmer(PC1 ~ Event + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m48 <- lmer(PC1 ~ Event + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m49 <- lmer(PC1 ~ Event + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m50 <- lmer(PC1 ~ Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m51 <- lmer(PC1 ~ Event + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m52 <- lmer(PC1 ~ Event + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m53 <- lmer(PC1 ~ Event + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m54 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m55 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m56 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m57 <- lmer(PC1 ~ ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m58 <- lmer(PC1 ~ ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m59 <- lmer(PC1 ~ ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m60 <- lmer(PC1 ~ DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m61 <- lmer(PC1 ~ DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m62 <- lmer(PC1 ~ DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m63 <- lmer(PC1 ~ MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Four Additive Combinations ####
+
+m64 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m65 <- lmer(PC1 ~ Sex + Event + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m66 <- lmer(PC1 ~ Sex + Event + ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m67 <- lmer(PC1 ~ Sex + Event + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m68 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m69 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m70 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m71 <- lmer(PC1 ~ Sex + Event + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m72 <- lmer(PC1 ~ Sex + Event + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m73 <- lmer(PC1 ~ Sex + Event + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m74 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m75 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m76 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m77 <- lmer(PC1 ~ Sex + ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m78 <- lmer(PC1 ~ Sex + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m79 <- lmer(PC1 ~ Sex + ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m80 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m81 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m82 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m83 <- lmer(PC1 ~ Sex + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m84 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m85 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m86 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m87 <- lmer(PC1 ~ Event + ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m88 <- lmer(PC1 ~ Event + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m89 <- lmer(PC1 ~ Event + ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m90 <- lmer(PC1 ~ Event + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m91 <- lmer(PC1 ~ Event + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m92 <- lmer(PC1 ~ Event + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m93 <- lmer(PC1 ~ Event + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m94 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m95 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m96 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m97 <- lmer(PC1 ~ ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m98 <- lmer(PC1 ~ DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Five Additive Combinations ####
+
+m99 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m100 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m101 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m102 <- lmer(PC1 ~ Sex + Event + ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m103 <- lmer(PC1 ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m104 <- lmer(PC1 ~ Sex + Event + ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m105 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m106 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m107 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m108 <- lmer(PC1 ~ Sex + Event + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m109 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m110 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m111 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m112 <- lmer(PC1 ~ Sex + ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m113 <- lmer(PC1 ~ Sex + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m114 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m115 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m116 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m117 <- lmer(PC1 ~ Event + ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m118 <- lmer(PC1 ~ Event + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m119 <- lmer(PC1 ~ ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Six Additive Combinations ####
+
+m120 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m121 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m122 <- lmer(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m123 <- lmer(PC1 ~ Sex + Event + ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m124 <- lmer(PC1 ~ Sex + Event + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m125 <- lmer(PC1 ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m126 <- lmer(PC1 ~ Event + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+-------------------------------
+
+Model selection based on AICc:
+
+          K AICc Delta_AICc AICcWt Cum.Wt   LL
+m6        5  253       0.00   0.09   0.09 -121
+m21       6  254       0.54   0.07   0.15 -120
+m24       6  254       0.92   0.05   0.20 -121
+m55       7  254       1.20   0.05   0.25 -119
+m28       6  255       1.55   0.04   0.29 -121
+m96       8  255       1.67   0.04   0.33 -118
+m59       7  255       1.89   0.03   0.36 -120
+m62       7  255       1.89   0.03   0.39 -120
+m12       6  255       2.19   0.03   0.42 -121
+m26       6  255       2.22   0.03   0.45 -121
+m36       7  256       2.51   0.02   0.48 -120
+m57       7  256       2.90   0.02   0.50 -120
+m.null    3  256       3.15   0.02   0.51 -125
+m39       7  256       3.23   0.02   0.53 -120
+m111      9  256       3.23   0.02   0.55 -118
+m60       7  256       3.29   0.02   0.56 -121
+m22       5  256       3.31   0.02   0.58 -123
+m7        4  257       3.35   0.02   0.60 -124
+m75       8  257       3.38   0.02   0.61 -119
+m79       8  257       3.39   0.02   0.63 -119
+m3        4  257       3.45   0.02   0.64 -124
+m56       6  257       3.50   0.01   0.66 -122
+m43       7  257       3.60   0.01   0.67 -121
+m94       8  257       3.61   0.01   0.69 -119
+m63       7  257       3.64   0.01   0.70 -121
+m25       5  257       4.01   0.01   0.71 -123
+m82       8  257       4.01   0.01   0.72 -120
+m119      9  257       4.15   0.01   0.73 -118
+m97       8  257       4.17   0.01   0.74 -120
+m98       8  257       4.18   0.01   0.75 -120
+m41       7  258       4.50   0.01   0.76 -121
+m4        4  258       4.62   0.01   0.77 -125
+m14       7  258       4.72   0.01   0.78 -121
+m19       5  258       4.76   0.01   0.79 -124
+m27       5  258       4.92   0.01   0.79 -124
+m77       8  258       4.95   0.01   0.80 -120
+m5        4  258       5.03   0.01   0.81 -125
+m58       6  258       5.08   0.01   0.82 -123
+m2        6  258       5.12   0.01   0.82 -123
+m44       8  258       5.32   0.01   0.83 -120
+m1        4  259       5.34   0.01   0.83 -125
+m76       7  259       5.36   0.01   0.84 -122
+m37       6  259       5.40   0.01   0.85 -123
+m95       7  259       5.49   0.01   0.85 -122
+m20       5  259       5.52   0.01   0.86 -124
+m13       5  259       5.59   0.01   0.86 -124
+m80       8  259       5.66   0.01   0.87 -120
+m9        5  259       5.70   0.00   0.87 -124
+m61       6  259       5.73   0.00   0.88 -123
+m109      9  259       5.76   0.00   0.88 -119
+m125     10  259       5.76   0.00   0.89 -118
+m17       8  259       5.77   0.00   0.89 -121
+m83       8  259       5.79   0.00   0.90 -121
+m112      9  259       5.86   0.00   0.90 -119
+m40       6  259       6.23   0.00   0.90 -123
+m113      9  260       6.41   0.00   0.91 -120
+m15       7  260       6.44   0.00   0.91 -122
+m47       8  260       6.51   0.00   0.91 -121
+m46       9  260       6.57   0.00   0.92 -120
+m23       5  260       6.65   0.00   0.92 -125
+m85      10  260       6.73   0.00   0.92 -118
+m18       7  260       6.73   0.00   0.93 -122
+m10       5  260       6.87   0.00   0.93 -125
+m49       9  260       6.89   0.00   0.93 -120
+m54       6  260       6.99   0.00   0.93 -124
+m34       6  260       7.05   0.00   0.94 -124
+m29       8  260       7.05   0.00   0.94 -121
+m53       9  260       7.09   0.00   0.94 -120
+m45       8  260       7.15   0.00   0.94 -121
+m64       9  260       7.19   0.00   0.95 -120
+m86       9  260       7.20   0.00   0.95 -120
+m42       6  260       7.21   0.00   0.95 -124
+m78       7  260       7.26   0.00   0.95 -122
+m11       5  260       7.26   0.00   0.96 -125
+m16       7  261       7.42   0.00   0.96 -123
+m8        7  261       7.49   0.00   0.96 -123
+m110      8  261       7.49   0.00   0.96 -121
+m84       9  261       7.82   0.00   0.96 -120
+m35       6  261       7.83   0.00   0.97 -124
+m81       7  261       8.03   0.00   0.97 -123
+m89      10  261       8.10   0.00   0.97 -119
+m50       8  261       8.14   0.00   0.97 -122
+m32       9  261       8.20   0.00   0.97 -120
+m51       9  261       8.27   0.00   0.97 -121
+m92      10  262       8.45   0.00   0.97 -119
+m100     11  262       8.56   0.00   0.98 -118
+m116     11  262       8.58   0.00   0.98 -118
+m66      10  262       8.81   0.00   0.98 -120
+m67       9  262       8.83   0.00   0.98 -121
+m48       8  262       8.83   0.00   0.98 -122
+m30       8  262       8.85   0.00   0.98 -122
+m101     10  262       8.93   0.00   0.98 -120
+m88       9  262       8.94   0.00   0.98 -121
+m38       6  262       8.95   0.00   0.98 -125
+m52       8  262       8.98   0.00   0.98 -122
+m87      10  262       9.14   0.00   0.99 -120
+m33       8  262       9.17   0.00   0.99 -122
+m69      10  262       9.29   0.00   0.99 -120
+m114     11  263       9.33   0.00   0.99 -118
+m74       7  263       9.35   0.00   0.99 -124
+m73      10  263       9.45   0.00   0.99 -120
+m90      10  263       9.46   0.00   0.99 -120
+m65       9  263       9.56   0.00   0.99 -121
+m93      10  263       9.59   0.00   0.99 -120
+m99      10  263       9.59   0.00   0.99 -120
+m115     10  263       9.75   0.00   0.99 -120
+m31       8  263       9.85   0.00   0.99 -123
+m122     12  263      10.13   0.00   0.99 -117
+m104     11  263      10.14   0.00   0.99 -119
+m91       9  264      10.49   0.00   0.99 -122
+m70       9  264      10.57   0.00   1.00 -122
+m120     12  264      10.69   0.00   1.00 -118
+m117     11  264      10.72   0.00   1.00 -119
+m107     11  264      10.75   0.00   1.00 -119
+m71      10  264      10.78   0.00   1.00 -120
+m118     11  264      11.04   0.00   1.00 -119
+m126     12  264      11.29   0.00   1.00 -118
+m68       9  264      11.32   0.00   1.00 -122
+m103     10  265      11.35   0.00   1.00 -121
+m102     11  265      11.40   0.00   1.00 -119
+m72       9  265      11.48   0.00   1.00 -122
+m121     11  265      11.57   0.00   1.00 -120
+m105     11  265      11.93   0.00   1.00 -120
+m108     11  265      12.03   0.00   1.00 -120
+m.global 13  266      12.63   0.00   1.00 -117
+m123     12  266      12.86   0.00   1.00 -119
+m106     10  266      12.99   0.00   1.00 -122
+m124     12  267      13.43   0.00   1.00 -119
+
+-------------------------------
+
+# Top Model Summaries:
+
+1. Fattening Index ~ AgCategory + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: PC1 ~ AgCategory + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+     252      265     -121      242       80 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.358 -0.670 -0.062  0.459  3.456 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 0.215    0.464   
+ Residual             0.910    0.954   
+Number of obs: 85, groups:  Species, 8
+
+Fixed effects:
+                   Estimate Std. Error t value
+(Intercept)           0.430      0.315    1.36
+AgCategoryModerate   -0.771      0.329   -2.34
+AgCategoryHigh       -0.179      0.331   -0.54
+
+Correlation of Fixed Effects:
+            (Intr) AgCtgM
+AgCtgryMdrt -0.732       
+AgCatgryHgh -0.699  0.740
+
+                    2.5 %  97.5 %
+.sig01              0.000  1.0656
+.sigma              0.818  1.1350
+(Intercept)        -0.289  1.0601
+AgCategoryModerate -1.486 -0.0585
+AgCategoryHigh     -0.885  0.5107
+
+# Significant difference between low and moderate agricultural intensity on fattening index.
+
+
+----------------
+
+
+2. Fattening Index ~ Capture Time + AgCategory + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: PC1 ~ ts.sunrise + AgCategory + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+     253      267     -120      241       79 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.433 -0.512 -0.021  0.479  3.407 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 0.156    0.395   
+ Residual             0.908    0.953   
+Number of obs: 85, groups:  Species, 8
+
+Fixed effects:
+                   Estimate Std. Error t value
+(Intercept)           0.419      0.303    1.38
+ts.sunrise            0.150      0.109    1.37
+AgCategoryModerate   -0.752      0.327   -2.30
+AgCategoryHigh       -0.168      0.329   -0.51
+
+Correlation of Fixed Effects:
+            (Intr) ts.snr AgCtgM
+ts.sunrise  -0.105              
+AgCtgryMdrt -0.762  0.144       
+AgCatgryHgh -0.727  0.105  0.739
+
+                     2.5 %  97.5 %
+.sig01              0.0000  0.9813
+.sigma              0.8160  1.1400
+(Intercept)        -0.2702  1.0280
+ts.sunrise         -0.0711  0.3773
+AgCategoryModerate -1.4515 -0.0457
+AgCategoryHigh     -0.8707  0.5196
+
+# Significant difference between low and moderate agricultural intensity on fattening index. No effect of capture time.
+
+---------------
+
+3. Fattening Index ~ Date + AgCategory + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: PC1 ~ DaysIntoSeason_S + AgCategory + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+     253      268     -120      241       79 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.413 -0.644 -0.009  0.525  3.222 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 0.190    0.436   
+ Residual             0.901    0.949   
+Number of obs: 85, groups:  Species, 8
+
+Fixed effects:
+                   Estimate Std. Error t value
+(Intercept)          0.2762     0.3384    0.82
+DaysIntoSeason_S    -0.1591     0.1337   -1.19
+AgCategoryModerate  -0.6266     0.3524   -1.78
+AgCategoryHigh       0.0561     0.3887    0.14
+
+Correlation of Fixed Effects:
+            (Intr) DyIS_S AgCtgM
+DysIntSsn_S  0.411              
+AgCtgryMdrt -0.782 -0.384       
+AgCatgryHgh -0.765 -0.536  0.781
+
+
+                    2.5 % 97.5 %
+.sig01              0.000  1.021
+.sigma              0.814  1.129
+(Intercept)        -0.461  0.952
+DaysIntoSeason_S   -0.426  0.107
+AgCategoryModerate -1.374  0.119
+AgCategoryHigh     -0.746  0.845
+
+# No significant effects of agricultural intensity or date on fattening index.
+
+----------------
+
+4. Fattening Index ~ Capture Time + Date + AgCategory + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: PC1 ~ ts.sunrise + DaysIntoSeason_S + AgCategory + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+     253      270     -120      239       78 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.513 -0.541 -0.060  0.491  3.241 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 0.134    0.367   
+ Residual             0.896    0.947   
+Number of obs: 85, groups:  Species, 8
+
+Fixed effects:
+                   Estimate Std. Error t value
+(Intercept)           0.246      0.328    0.75
+ts.sunrise            0.162      0.109    1.49
+DaysIntoSeason_S     -0.175      0.132   -1.32
+AgCategoryModerate   -0.586      0.351   -1.67
+AgCategoryHigh        0.095      0.387    0.25
+
+Correlation of Fixed Effects:
+            (Intr) ts.snr DyIS_S AgCtgM
+ts.sunrise  -0.125                     
+DysIntSsn_S  0.429 -0.060              
+AgCtgryMdrt -0.810  0.160 -0.393       
+AgCatgryHgh -0.791  0.123 -0.540  0.783
+
+                    2.5 % 97.5 %
+.sig01              0.0000 0.9296
+.sigma              0.8112 1.1271
+(Intercept)        -0.4628 0.9023
+ts.sunrise         -0.0578 0.3849
+DaysIntoSeason_S   -0.4376 0.0887
+AgCategoryModerate -1.3195 0.1523
+AgCategoryHigh     -0.7043 0.8823
+
+# No significant effects of date, agricultural intensity, or capture time on fattening index.
+
+--------------
+
+5. Fattening Index ~ AgCategory + Detection + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: PC1 ~ AgCategory + Detection + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+     254      268     -121      242       79 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.301 -0.605 -0.021  0.516  3.428 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 0.225    0.474   
+ Residual             0.899    0.948   
+Number of obs: 85, groups:  Species, 8
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)               0.267      0.363    0.74
+AgCategoryModerate       -0.741      0.329   -2.25
+AgCategoryHigh           -0.203      0.331   -0.61
+DetectionNon-detection    0.220      0.251    0.88
+
+Correlation of Fixed Effects:
+            (Intr) AgCtgM AgCtgH
+AgCtgryMdrt -0.668              
+AgCatgryHgh -0.549  0.727       
+DtctnNn-dtc -0.491  0.075 -0.107
+
+                        2.5 %  97.5 %
+.sig01                  0.000  1.0818
+.sigma                  0.813  1.1280
+(Intercept)            -0.536  0.9966
+AgCategoryModerate     -1.455 -0.0303
+AgCategoryHigh         -0.906  0.4843
+DetectionNon-detection -0.277  0.7182
+
+# Significant difference between low and moderate ag intensity. No effect of detection on fattening index.
+
+-------------------------------
+
+# no significant violations of heterogeneity in any of the top models
+

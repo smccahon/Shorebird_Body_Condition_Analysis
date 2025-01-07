@@ -1,0 +1,474 @@
+This file serves as supportive documentation to Shelby McCahon's All Species body mass analysis. 
+
+Date Created: 2024-11-12
+Date Modified: 2024-11-18
+
+-------------------------------
+
+Species tested (n = 9 species; n = 170 birds): 
+Lesser Yellowlegs (n = 54)
+Least Sandpiper (n = 33)
+Semipalmated Sandpiper (n = 21)
+Wilson's Phalarope (n = 19)
+Pectoral Sandpiper (n = 16)
+Killdeer (n = 15)
+Willet (n = 10)
+Long-billed Dowitcher (n = 6)
+American Avocet (n = 4)
+
+-------------------------------
+
+# Identify best random intercept/slope model structure ####
+
+# Random Intercept Models
+m1 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + 
+                     Detection + (1 | Species), data = birds.cs)
+
+# Random Slope Models
+# All other random slope models failed to converge
+m2 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + 
+                     Detection + (Sex | Species), data = birds.cs)
+
+m3 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + 
+             Detection + (DaysIntoSeason_S | Species), data = birds.cs)
+
+model_names <- paste0("m", 1:3)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt Res.LL
+m2 12  100        0.0      1      1  -37.1
+m3 12  128       27.2      0      1  -50.8
+m1 10  128       27.4      0      1  -53.1
+
+**Random slope of Sex | Species is the best. I also applied this to LogNeonic models and the conclusion is the same. 
+**However, this random slope has issues of model convergence for several models. Default to (1 | Species) only. 
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- lmer(Mass ~ DaysIntoSeason_S + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Julian + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4  108       0.00   0.92   0.92 -50.1
+m2 4  113       4.99   0.08   1.00 -52.6
+
+**Conclusion: Days into season performs best
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoid ####
+
+m1 <- lmer(Mass ~ OverallNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ LogNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ Detection + (1 | Species), data = birds.cs, REML = FALSE)
+
+model_names <- paste0("m", 1:3)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4  117       0.00   0.35   0.35 -54.4
+m3 4  117       0.11   0.33   0.67 -54.5
+m2 4  117       0.12   0.33   1.00 -54.5
+
+**Conclusion: All three perform similarly (within 2 Delta AICc). Log transformation is necessary to address issues of homoscedasticity. Detection makes sense biologically. Try both log transformation and detection.
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lmer(Mass ~ Event * ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Event + I(ts.sunrise^2) + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ Event + ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 10 75.3        0.0      1      1 -27.0
+m2  7 89.2       13.8      0      1 -37.3
+m3  7 90.1       14.8      0      1 -37.7
+
+# Model with interaction by far performs the best.
+
+-------------------------------
+
+## Interaction Analysis: Detection & Sampling Event ####
+
+m1 <- lmer(Mass ~ Event * Detection + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Event + Detection + (1 | Species), data = birds.cs, REML = FALSE)
+
+model_names <- paste0("m", 1:2)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+# Model with interaction performs significantly better
+
+-------------------------------
+
+## Interaction Analysis: Date * Migratory Status ####
+
+m1 <- lmer(Mass ~ DaysIntoSeason_S + MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 6  106       0.00   0.57   0.57 -46.6
+m1 5  106       0.57   0.43   1.00 -48.0
+
+# Model with interaction performs significantly better
+
+-------------------------------
+
+INTERACTIONS INCLUDED: 
+DaysIntoSeason_S * MigStatus
+Event * Detection
+Event * ts.sunrise
+
+-------------------------------
+
+m.global <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + 
+                     MigStatus + PercentAg + Detection +
+                     MigStatus * DaysIntoSeason_S + 
+                       Detection * Event +
+                       Event * ts.sunrise + (1 | Species), REML = FALSE, data = birds.cs)
+
+
+m.null <- lmer(Mass ~ 1 + (1|Species), data = birds.cs, REML = FALSE)
+
+## Single Covariate Models ####
+
+
+m1 <- lmer(Mass ~ Sex + (1|Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Event + (1|Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m4 <- lmer(Mass ~ DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m5 <- lmer(Mass ~ MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m6 <- lmer(Mass ~ PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m7 <- lmer(Mass ~ Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+
+##  Additive Models ####
+
+### Two additive combinations ####
+
+m8 <- lmer(Mass ~ Sex + Event + (1|Species), data = birds.cs, REML = FALSE)
+m9 <- lmer(Mass ~ Sex + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m10 <- lmer(Mass ~ Sex + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m11 <- lmer(Mass ~ Sex + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m12 <- lmer(Mass ~ Sex + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m13 <- lmer(Mass ~ Sex + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m14 <- lmer(Mass ~ Event + ts.sunrise + (1|Species) + Event*ts.sunrise, data = birds.cs, REML = FALSE)
+m15 <- lmer(Mass ~ Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m16 <- lmer(Mass ~ Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m17 <- lmer(Mass ~ Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m18 <- lmer(Mass ~ Event + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m19 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m20 <- lmer(Mass ~ ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m21 <- lmer(Mass ~ ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m22 <- lmer(Mass ~ ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m23 <- lmer(Mass ~ DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m24 <- lmer(Mass ~ DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m25 <- lmer(Mass ~ DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m26 <- lmer(Mass ~ MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m27 <- lmer(Mass ~ MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m28 <- lmer(Mass ~ PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Three Additive Combinations ####
+
+m29 <- lmer(Mass ~ Sex + Event + ts.sunrise + (1|Species) + Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m30 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m31 <- lmer(Mass ~ Sex + Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m32 <- lmer(Mass ~ Sex + Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m33 <- lmer(Mass ~ Sex + Event + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m34 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m35 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m36 <- lmer(Mass ~ Sex + ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m37 <- lmer(Mass ~ Sex + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m38 <- lmer(Mass ~ Sex + DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m39 <- lmer(Mass ~ Sex + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m40 <- lmer(Mass ~ Sex + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m41 <- lmer(Mass ~ Sex + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m42 <- lmer(Mass ~ Sex + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m43 <- lmer(Mass ~ Sex + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m44 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m45 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m46 <- lmer(Mass ~ Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m47 <- lmer(Mass ~ Event * ts.sunrise + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m48 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m49 <- lmer(Mass ~ Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m50 <- lmer(Mass ~ Event + DaysIntoSeason_S + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m51 <- lmer(Mass ~ Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m52 <- lmer(Mass ~ Event + MigStatus + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m53 <- lmer(Mass ~ Event + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m54 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m55 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m56 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m57 <- lmer(Mass ~ ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m58 <- lmer(Mass ~ ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m59 <- lmer(Mass ~ ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m60 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m61 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m62 <- lmer(Mass ~ DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m63 <- lmer(Mass ~ MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Four Additive Combinations ####
+
+m64 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m65 <- lmer(Mass ~ Sex + Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m66 <- lmer(Mass ~ Sex + Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m67 <- lmer(Mass ~ Sex + Event * ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m68 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m69 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m70 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m71 <- lmer(Mass ~ Sex + Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m72 <- lmer(Mass ~ Sex + Event + MigStatus + Detection + (1|Species) + Event * MigStatus, data = birds.cs, REML = FALSE)
+m73 <- lmer(Mass ~ Sex + Event + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m74 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m75 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m76 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m77 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m78 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m79 <- lmer(Mass ~ Sex + ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m80 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m81 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m82 <- lmer(Mass ~ Sex + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m83 <- lmer(Mass ~ Sex + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m84 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m85 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m86 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m87 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m88 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m89 <- lmer(Mass ~ Event * ts.sunrise + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m90 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m91 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m92 <- lmer(Mass ~ Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m93 <- lmer(Mass ~ Event + MigStatus + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m94 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m95 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m96 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m97 <- lmer(Mass ~ ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m98 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Five Additive Combinations ####
+
+m99 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species) +
+               DaysIntoSeason_S * MigStatus + Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m100 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m101 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species) +
+               Event * ts.sunrise + Event * Detection, data = birds.cs, REML = FALSE)
+m102 <- lmer(Mass ~ Sex + Event + ts.sunrise + MigStatus + PercentAg + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m103 <- lmer(Mass ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1|Species) +
+               Event * ts.sunrise + Event * Detection, data = birds.cs, REML = FALSE)
+m104 <- lmer(Mass ~ Sex + Event + ts.sunrise + PercentAg + Detection + (1|Species) +
+               Event * ts.sunrise + Event * Detection, data = birds.cs, REML = FALSE)
+m105 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m106 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
+               Event * Detection + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m107 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species) +
+               Event * Detection, data = birds.cs, REML = FALSE)
+m108 <- lmer(Mass ~ Sex + Event + MigStatus + PercentAg + Detection + (1|Species) +
+               Event * Detection, data = birds.cs, REML = FALSE)
+m109 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m110 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m111 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m112 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m113 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m114 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m115 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m116 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m117 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m118 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m119 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Six Additive Combinations ####
+
+m120 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               Event * ts.sunrise + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m121 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species) +
+               Event * Detection, data = birds.cs, REML = FALSE)
+m122 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species) +
+               Event * Detection, data = birds.cs, REML = FALSE)
+m123 <- lmer(Mass ~ Sex + Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m124 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species) + Event * Detection, data = birds.cs, REML = FALSE)
+m125 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m126 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+-------------------------------
+
+# AIC Model Selection:
+
+Model selection based on AICc (shortened and standardized):
+
+Model selection based on AICc:
+
+          K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m103     16  69.7       0.00   0.26   0.26 -17.0
+m121     18  71.0       1.40   0.13   0.40 -15.2
+m123     17  72.1       2.44   0.08   0.47 -17.0
+.
+.
+.
+
+-------------------------------
+
+# Top Model Summaries :
+
+1. Mass ~ Sex + Sampling Occasion + Capture Time + Detection + Migratory Status + (Sampling Occasion * Capture Time) + (Sampling Occasion * Detection) + (1 | Species) (m103)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1 |  
+    Species) + Event * ts.sunrise + Event * Detection
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+    66.1    116.0    -17.0     34.1      152 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-3.878 -0.428 -0.032  0.431  4.844 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.0236   1.01    
+ Residual             0.0531   0.23    
+Number of obs: 168, groups:  Species, 9
+
+Fixed effects:
+                                        Estimate Std. Error t value
+(Intercept)                               0.0717     0.4628    0.15
+SexFemale                                 0.0503     0.0432    1.16
+EventFall_2023                           -0.3966     0.1095   -3.62
+EventSpring_2022                         -0.4031     0.1388   -2.90
+EventSpring_2023                         -0.4727     0.1172   -4.03
+ts.sunrise                                0.4863     0.0982    4.95
+MigStatusResident                         1.5840     0.6809    2.33
+DetectionNon-detection                   -0.1702     0.1070   -1.59
+EventFall_2023:ts.sunrise                -0.5379     0.1026   -5.24
+EventSpring_2022:ts.sunrise              -0.3516     0.1737   -2.02
+EventSpring_2023:ts.sunrise              -0.4953     0.1087   -4.55
+EventFall_2023:DetectionNon-detection     0.1043     0.1290    0.81
+EventSpring_2022:DetectionNon-detection   1.0744     0.3031    3.54
+EventSpring_2023:DetectionNon-detection   0.3358     0.1417    2.37
+
+                                          2.5 %   97.5 %
+.sig01                                   0.6746  1.75019
+.sigma                                   0.2072  0.25819
+(Intercept)                             -0.9359  1.07744
+SexFemale                               -0.0350  0.13538
+EventFall_2023                          -0.6127 -0.18067
+EventSpring_2022                        -0.6770 -0.12953
+EventSpring_2023                        -0.7038 -0.24149
+ts.sunrise                               0.2927  0.68016
+MigStatusResident                        0.0952  3.07683
+DetectionNon-detection                  -0.3813  0.04080
+EventFall_2023:ts.sunrise               -0.7404 -0.33573
+EventSpring_2022:ts.sunrise             -0.6943 -0.00916
+EventSpring_2023:ts.sunrise             -0.7098 -0.28088
+EventFall_2023:DetectionNon-detection   -0.1500  0.35872
+EventSpring_2022:DetectionNon-detection  0.4767  1.67357
+EventSpring_2023:DetectionNon-detection  0.0562  0.61521
+
+*Conclusion: The interaction between capture time and sampling occasion is significant suggesting birds in Fall 2021 had a positive relationship between capture time and body mass. Migrant status and the interaction between detections and sampling event on mass are also significant. 
+
+
+#------------------------------#
+
+Fall 2023 as reference Event:
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1 |  
+    Species) + Event * ts.sunrise + Event * Detection
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+    66.1    116.0    -17.0     34.1      152 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-3.878 -0.428 -0.032  0.431  4.844 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.0236   1.01    
+ Residual             0.0531   0.23    
+Number of obs: 168, groups:  Species, 9
+
+Fixed effects:
+                                        Estimate Std. Error t value
+(Intercept)                             -0.32482    0.45812   -0.71
+SexFemale                                0.05026    0.04318    1.16
+EventFall_2021                           0.39655    0.10952    3.62
+EventSpring_2022                        -0.00659    0.12291   -0.05
+EventSpring_2023                        -0.07616    0.10214   -0.75
+ts.sunrise                              -0.05162    0.02567   -2.01
+MigStatusResident                        1.58400    0.68091    2.33
+DetectionNon-detection                  -0.06590    0.07103   -0.93
+EventFall_2021:ts.sunrise                0.53794    0.10258    5.24
+EventSpring_2022:ts.sunrise              0.18633    0.14331    1.30
+EventSpring_2023:ts.sunrise              0.04269    0.05224    0.82
+EventFall_2021:DetectionNon-detection   -0.10426    0.12897   -0.81
+EventSpring_2022:DetectionNon-detection  0.97013    0.28996    3.35
+EventSpring_2023:DetectionNon-detection  0.23150    0.12025    1.93
+
+                                           2.5 %    97.5 %
+.sig01                                   0.67457  1.750191
+.sigma                                   0.20717  0.258195
+(Intercept)                             -1.32417  0.675574
+SexFemale                               -0.03495  0.135383
+EventFall_2021                           0.18067  0.612656
+EventSpring_2022                        -0.24899  0.235742
+EventSpring_2023                        -0.27751  0.125577
+ts.sunrise                              -0.10225 -0.000998
+MigStatusResident                        0.09517  3.076832
+DetectionNon-detection                  -0.20593  0.074209
+EventFall_2021:ts.sunrise                0.33573  0.740394
+EventSpring_2022:ts.sunrise             -0.09627  0.468910
+EventSpring_2023:ts.sunrise             -0.06031  0.145724
+EventFall_2021:DetectionNon-detection   -0.35872  0.149972
+EventSpring_2022:DetectionNon-detection  0.39841  1.543144
+EventSpring_2023:DetectionNon-detection -0.00591  0.468537
+
+**Conclusion: Birds in fall 2021 had a positive relationship between mass and capture time whereas birds in fall 2023 had a negative relationship between mass and capture time. Residents have significantly higher mass.
+
+-------------------------------
+
+NOTE!! Cannot actually consider interaction between event and detection because all birds but one had detections in spring 2022...
+
+-------------------------------
+
+# Model Validation: Still investigating...how to do this for mixed effects models?
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,846 @@
+This file serves as supportive documentation to Shelby McCahon's All Species body mass analysis. 
+
+Date Created: 2024-11-12
+Date Modified: 2024-12-16
+
+-------------------------------
+
+Species tested (n = 9 species; n = 176 birds): 
+Lesser Yellowlegs (n = 54)
+Least Sandpiper (n = 32)
+Semipalmated Sandpiper (n = 21)
+Wilson's Phalarope (n = 19)
+Pectoral Sandpiper (n = 15)
+Killdeer (n = 15)
+Willet (n = 10)
+Long-billed Dowitcher (n = 6)
+American Avocet (n = 4)
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- lmer(Mass ~ DaysIntoSeason_S + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Julian + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4  108       0.00   0.92   0.92 -50.1
+m2 4  113       4.99   0.08   1.00 -52.6
+
+**Conclusion: Days into season performs best
+
+-------------------------------
+
+## Univariate Analysis: Neonicotinoid ####
+
+m1 <- lmer(Mass ~ OverallNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ LogNeonic + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ Detection + (1 | Species), data = birds.cs, REML = FALSE)
+
+model_names <- paste0("m", 1:3)
+
+models <- mget(model_names)
+
+aictab(models, modnames = model_names)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 4  117       0.00   0.35   0.35 -54.4
+m3 4  117       0.11   0.33   0.67 -54.5
+m2 4  117       0.12   0.33   1.00 -54.5
+
+**Conclusion: All three perform similarly (within 2 Delta AICc). Log transformation is necessary to address issues of homoscedasticity. Detection makes sense biologically. Try both log transformation and detection.
+
+-------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- lmer(Mass ~ AgCategory + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ PercentAg + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m2 4 111.52          0   0.62   0.62 -51.64
+m1 5 112.52          1   0.38   1.00 -51.08
+
+# Agricultural intensity as a continuous variable performs significantly better.
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lmer(Mass ~ Event * ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Event + I(ts.sunrise^2) + (1 | Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ Event + ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 10 75.3        0.0      1      1 -27.0
+m2  7 89.2       13.8      0      1 -37.3
+m3  7 90.1       14.8      0      1 -37.7
+
+# Model with interaction by far performs the best.
+
+-------------------------------
+
+## Interaction Analysis: Date * Migratory Status ####
+
+m1 <- lmer(Mass ~ DaysIntoSeason_S + MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 6  106       0.00   0.57   0.57 -46.6
+m1 5  106       0.57   0.43   1.00 -48.0
+
+# Model with interaction performs significantly better
+
+-------------------------------
+
+INTERACTIONS INCLUDED: 
+DaysIntoSeason_S * MigStatus
+Event * ts.sunrise
+
+-------------------------------
+
+m.global <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + 
+                     MigStatus + PercentAg + Detection +
+                     MigStatus * DaysIntoSeason_S +
+                     Event * ts.sunrise + (1 | Species), REML = FALSE, data = birds.cs)
+
+m.null <- lmer(Mass ~ 1 + (1|Species), data = birds.cs, REML = FALSE)
+
+## Single Covariate Models ####
+
+m1 <- lmer(Mass ~ Sex + (1|Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Mass ~ Event + (1|Species), data = birds.cs, REML = FALSE)
+m3 <- lmer(Mass ~ ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m4 <- lmer(Mass ~ DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m5 <- lmer(Mass ~ MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m6 <- lmer(Mass ~ PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m7 <- lmer(Mass ~ Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+##  Additive Models ####
+
+### Two additive combinations ####
+
+m8 <- lmer(Mass ~ Sex + Event + (1|Species), data = birds.cs, REML = FALSE)
+m9 <- lmer(Mass ~ Sex + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
+m10 <- lmer(Mass ~ Sex + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m11 <- lmer(Mass ~ Sex + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m12 <- lmer(Mass ~ Sex + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m13 <- lmer(Mass ~ Sex + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m14 <- lmer(Mass ~ Event + ts.sunrise + (1|Species) + Event*ts.sunrise, data = birds.cs, REML = FALSE)
+m15 <- lmer(Mass ~ Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m16 <- lmer(Mass ~ Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m17 <- lmer(Mass ~ Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m18 <- lmer(Mass ~ Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m19 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m20 <- lmer(Mass ~ ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m21 <- lmer(Mass ~ ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m22 <- lmer(Mass ~ ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m23 <- lmer(Mass ~ DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m24 <- lmer(Mass ~ DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m25 <- lmer(Mass ~ DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m26 <- lmer(Mass ~ MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m27 <- lmer(Mass ~ MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m28 <- lmer(Mass ~ PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Three Additive Combinations ####
+
+m29 <- lmer(Mass ~ Sex + Event + ts.sunrise + (1|Species) + Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m30 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m31 <- lmer(Mass ~ Sex + Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m32 <- lmer(Mass ~ Sex + Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m33 <- lmer(Mass ~ Sex + Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m34 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m35 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m36 <- lmer(Mass ~ Sex + ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m37 <- lmer(Mass ~ Sex + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m38 <- lmer(Mass ~ Sex + DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m39 <- lmer(Mass ~ Sex + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m40 <- lmer(Mass ~ Sex + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m41 <- lmer(Mass ~ Sex + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m42 <- lmer(Mass ~ Sex + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m43 <- lmer(Mass ~ Sex + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m44 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m45 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m46 <- lmer(Mass ~ Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m47 <- lmer(Mass ~ Event * ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m48 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m49 <- lmer(Mass ~ Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m50 <- lmer(Mass ~ Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m51 <- lmer(Mass ~ Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m52 <- lmer(Mass ~ Event + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m53 <- lmer(Mass ~ Event + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m54 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m55 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m56 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m57 <- lmer(Mass ~ ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m58 <- lmer(Mass ~ ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m59 <- lmer(Mass ~ ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m60 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m61 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m62 <- lmer(Mass ~ DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m63 <- lmer(Mass ~ MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Four Additive Combinations ####
+
+m64 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
+m65 <- lmer(Mass ~ Sex + Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m66 <- lmer(Mass ~ Sex + Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m67 <- lmer(Mass ~ Sex + Event * ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m68 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m69 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m70 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m71 <- lmer(Mass ~ Sex + Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m72 <- lmer(Mass ~ Sex + Event + MigStatus + Detection + (1|Species) + Event * MigStatus, data = birds.cs, REML = FALSE)
+m73 <- lmer(Mass ~ Sex + Event + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m74 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m75 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m76 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m77 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m78 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m79 <- lmer(Mass ~ Sex + ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m80 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m81 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m82 <- lmer(Mass ~ Sex + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m83 <- lmer(Mass ~ Sex + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m84 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
+m85 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m86 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m87 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m88 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m89 <- lmer(Mass ~ Event * ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m90 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m91 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m92 <- lmer(Mass ~ Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m93 <- lmer(Mass ~ Event + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m94 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m95 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m96 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m97 <- lmer(Mass ~ ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m98 <- lmer(Mass ~ DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Five Additive Combinations ####
+
+m99 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species) +
+               DaysIntoSeason_S * MigStatus + Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m100 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m101 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m102 <- lmer(Mass ~ Sex + Event + ts.sunrise + MigStatus + PercentAg + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m103 <- lmer(Mass ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m104 <- lmer(Mass ~ Sex + Event + ts.sunrise + PercentAg + Detection + (1|Species) +
+               Event * ts.sunrise, data = birds.cs, REML = FALSE)
+m105 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m106 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
+                + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m107 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m108 <- lmer(Mass ~ Sex + Event + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m109 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m110 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
+               DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m111 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m112 <- lmer(Mass ~ Sex + ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m113 <- lmer(Mass ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m114 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
+m115 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m116 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m117 <- lmer(Mass ~ Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m118 <- lmer(Mass ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m119 <- lmer(Mass ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+### Six Additive Combinations ####
+
+m120 <- lmer(Mass ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
+               Event * ts.sunrise + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
+m121 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m122 <- lmer(Mass ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m123 <- lmer(Mass ~ Sex + Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m124 <- lmer(Mass ~ Sex + Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m125 <- lmer(Mass ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m126 <- lmer(Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+
+-------------------------------
+
+Model selection based on AICc:
+
+          K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m45      11  73.39       0.00   0.18   0.18 -24.89
+m87      12  73.60       0.21   0.16   0.34 -23.84
+m84      13  74.24       0.85   0.12   0.46 -23.00
+m14      10  75.33       1.94   0.07   0.52 -27.00
+m46      11  75.44       2.05   0.06   0.59 -25.92
+m99      14  75.59       2.19   0.06   0.65 -22.45
+m65      12  75.63       2.24   0.06   0.71 -24.83
+m44      11  75.79       2.40   0.05   0.76 -26.09
+m114     14  75.85       2.46   0.05   0.81 -22.62
+m102     13  76.43       3.04   0.04   0.85 -24.06
+m120     15  77.30       3.91   0.03   0.88 -22.10
+m85      12  77.39       4.00   0.02   0.90 -25.74
+m29      11  77.54       4.15   0.02   0.92 -26.94
+m66      12  78.26       4.86   0.02   0.94 -26.14
+m64      12  78.68       5.29   0.01   0.95 -26.35
+m103     13  79.71       6.31   0.01   0.96 -25.67
+m121     15  80.21       6.82   0.01   0.97 -23.53
+m100     13  80.41       7.02   0.01   0.97 -26.05
+m123     14  80.92       7.53   0.00   0.98 -25.09
+m88      12  81.14       7.75   0.00   0.98 -27.57
+m67      12  81.57       8.18   0.00   0.98 -27.78
+m117     13  81.80       8.40   0.00   0.98 -26.72
+m.global 16  82.09       8.70   0.00   0.99 -23.24
+m115     14  82.67       9.28   0.00   0.99 -25.97
+m104     13  82.70       9.31   0.00   0.99 -27.17
+m47      11  83.04       9.65   0.00   0.99 -29.68
+m101     13  83.09       9.70   0.00   0.99 -27.36
+m72      12  83.54      10.15   0.00   0.99 -28.76
+m89      12  83.59      10.20   0.00   1.00 -28.80
+m86      12  83.95      10.56   0.00   1.00 -28.98
+m126     15  84.47      11.08   0.00   1.00 -25.67
+m122     14  84.98      11.58   0.00   1.00 -27.12
+m116     13  85.70      12.30   0.00   1.00 -28.67
+m16       7  85.97      12.58   0.00   1.00 -35.65
+m51       8  86.02      12.63   0.00   1.00 -34.58
+m48       9  87.51      14.12   0.00   1.00 -34.21
+m90      10  87.75      14.36   0.00   1.00 -33.21
+m17       7  87.91      14.52   0.00   1.00 -36.62
+m2        6  87.97      14.58   0.00   1.00 -37.74
+m31       8  88.45      15.05   0.00   1.00 -35.78
+m71       9  89.05      15.66   0.00   1.00 -34.97
+m68      10  89.19      15.80   0.00   1.00 -33.91
+m105     11  89.63      16.24   0.00   1.00 -32.98
+m15       7  89.66      16.26   0.00   1.00 -37.49
+m49       8  90.05      16.66   0.00   1.00 -36.59
+m8        7  90.39      17.00   0.00   1.00 -37.85
+m32       8  90.90      17.51   0.00   1.00 -37.01
+m52       8  92.31      18.92   0.00   1.00 -37.71
+m30       8  92.33      18.94   0.00   1.00 -37.72
+m93       9  92.57      19.18   0.00   1.00 -36.72
+m108     10  92.69      19.30   0.00   1.00 -35.64
+m69       9  93.04      19.65   0.00   1.00 -36.96
+m106     11  93.07      19.68   0.00   1.00 -34.69
+m33       8  93.65      20.25   0.00   1.00 -38.37
+m124     12  93.82      20.42   0.00   1.00 -33.90
+m18       7  94.30      20.90   0.00   1.00 -39.80
+m91      10  94.38      20.98   0.00   1.00 -36.49
+m53       8  94.43      21.04   0.00   1.00 -38.77
+m73       9  94.52      21.13   0.00   1.00 -37.69
+m118     11  94.81      21.42   0.00   1.00 -35.56
+m70       9  95.70      22.30   0.00   1.00 -38.28
+m50       8  96.08      22.68   0.00   1.00 -39.59
+m92       9  96.60      23.21   0.00   1.00 -38.73
+m107     10  96.68      23.29   0.00   1.00 -37.64
+m60       7  96.78      23.39   0.00   1.00 -41.06
+m80       8  98.46      25.07   0.00   1.00 -40.79
+m94       8  98.97      25.58   0.00   1.00 -41.06
+m24       5 100.22      26.83   0.00   1.00 -44.93
+m109      9 100.68      27.29   0.00   1.00 -40.78
+m113      9 101.61      28.21   0.00   1.00 -41.23
+m98       8 102.06      28.66   0.00   1.00 -42.58
+m55       6 102.32      28.93   0.00   1.00 -44.91
+m39       6 103.25      29.86   0.00   1.00 -45.37
+m125     10 103.87      30.47   0.00   1.00 -41.23
+m119      9 104.29      30.90   0.00   1.00 -42.58
+m62       6 105.22      31.83   0.00   1.00 -46.35
+m75       7 105.29      31.90   0.00   1.00 -45.30
+m23       6 105.76      32.36   0.00   1.00 -46.63
+m38       7 105.80      32.41   0.00   1.00 -45.56
+m82       7 105.86      32.47   0.00   1.00 -45.58
+m96       7 107.36      33.96   0.00   1.00 -46.33
+m54       7 107.84      34.45   0.00   1.00 -46.59
+m74       8 107.94      34.54   0.00   1.00 -45.52
+m111      8 108.02      34.63   0.00   1.00 -45.56
+m81       8 108.05      34.65   0.00   1.00 -45.57
+m4        4 108.45      35.06   0.00   1.00 -50.11
+m26       5 109.42      36.03   0.00   1.00 -49.53
+m10       5 109.74      36.34   0.00   1.00 -49.69
+m61       7 109.85      36.46   0.00   1.00 -47.58
+m110      9 110.12      36.73   0.00   1.00 -45.49
+m5        4 110.34      36.95   0.00   1.00 -51.05
+m19       5 110.55      37.16   0.00   1.00 -50.10
+m40       6 111.51      38.12   0.00   1.00 -49.49
+m6        4 111.52      38.13   0.00   1.00 -51.64
+m57       6 111.56      38.17   0.00   1.00 -49.53
+m95       8 111.87      38.48   0.00   1.00 -47.48
+m34       6 111.88      38.49   0.00   1.00 -49.69
+m20       5 112.42      39.03   0.00   1.00 -51.04
+m11       5 112.44      39.05   0.00   1.00 -51.04
+m.null    3 112.53      39.14   0.00   1.00 -53.19
+m41       6 112.55      39.16   0.00   1.00 -50.02
+m25       5 112.58      39.19   0.00   1.00 -51.11
+m21       5 113.64      40.25   0.00   1.00 -51.64
+m76       7 113.66      40.26   0.00   1.00 -49.48
+m1        4 114.56      41.16   0.00   1.00 -53.16
+m63       6 114.56      41.17   0.00   1.00 -51.02
+m3        4 114.59      41.20   0.00   1.00 -53.18
+m35       6 114.59      41.20   0.00   1.00 -51.04
+m12       5 114.59      41.20   0.00   1.00 -52.11
+m56       6 114.67      41.28   0.00   1.00 -51.08
+m77       7 114.71      41.32   0.00   1.00 -50.01
+m27       5 115.10      41.70   0.00   1.00 -52.36
+m42       6 115.13      41.74   0.00   1.00 -51.30
+m83       7 115.62      42.23   0.00   1.00 -50.46
+m28       5 116.57      43.18   0.00   1.00 -53.10
+m9        5 116.68      43.29   0.00   1.00 -53.16
+m36       6 116.72      43.32   0.00   1.00 -52.10
+m97       7 116.74      43.34   0.00   1.00 -51.02
+m13       5 117.18      43.78   0.00   1.00 -53.40
+m58       6 117.20      43.80   0.00   1.00 -52.34
+m7        4 117.22      43.82   0.00   1.00 -54.49
+m78       7 117.28      43.89   0.00   1.00 -51.29
+m43       6 117.59      44.20   0.00   1.00 -52.53
+m112      8 117.83      44.43   0.00   1.00 -50.46
+m59       6 118.72      45.33   0.00   1.00 -53.10
+m22       5 119.29      45.90   0.00   1.00 -54.46
+m37       6 119.31      45.91   0.00   1.00 -53.39
+m79       7 119.77      46.37   0.00   1.00 -52.53
+
+-------------------------------
+
+# Top Model Summary
+
+1. Mass ~ Event * Time + Migratory Status + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Event * ts.sunrise + MigStatus + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+    71.8    106.7    -24.9     49.8      165 
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.7995 -0.3567 -0.0575  0.3608  5.0805 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.07629  1.0374  
+ Residual             0.05827  0.2414  
+Number of obs: 176, groups:  Species, 9
+
+Fixed effects:
+                            Estimate Std. Error t value
+(Intercept)                 -0.01886    0.46737  -0.040
+EventFall_2023              -0.34256    0.05688  -6.022
+EventSpring_2022            -0.21559    0.11629  -1.854
+EventSpring_2023            -0.26317    0.07254  -3.628
+ts.sunrise                   0.42229    0.09583   4.407
+MigStatusResident            1.61733    0.69788   2.317
+EventFall_2023:ts.sunrise   -0.46778    0.10015  -4.671
+EventSpring_2022:ts.sunrise -0.38112    0.17536  -2.173
+EventSpring_2023:ts.sunrise -0.38500    0.10597  -3.633
+
+Correlation of Fixed Effects:
+            (Intr) EvF_2023 EvS_2022 EvS_2023 ts.snr MgSttR EF_2023: ES_2022:
+EvntFl_2023 -0.096                                                           
+EvntSp_2022 -0.051  0.406                                                    
+EvntSp_2023 -0.092  0.628    0.375                                           
+ts.sunrise   0.000 -0.017    0.007    0.061                                  
+MgSttsRsdnt -0.662  0.004   -0.007   -0.005   -0.008                         
+EvnF_2023:.  0.006  0.000   -0.032   -0.103   -0.967  0.007                  
+EvnS_2022:.  0.005 -0.015   -0.629   -0.072   -0.561  0.005  0.558           
+EvnS_2023:. -0.001 -0.021   -0.066   -0.060   -0.896  0.011  0.877    0.525  
+
+                              2.5 %  97.5 %
+.sig01                       0.6923  1.7939
+.sigma                       0.2176  0.2698
+(Intercept)                 -1.0402  1.0030
+EventFall_2023              -0.4547 -0.2304
+EventSpring_2022            -0.4448  0.0137
+EventSpring_2023            -0.4061 -0.1201
+ts.sunrise                   0.2334  0.6113
+MigStatusResident            0.0909  3.1465
+EventFall_2023:ts.sunrise   -0.6653 -0.2704
+EventSpring_2022:ts.sunrise -0.7271 -0.0355
+EventSpring_2023:ts.sunrise -0.5940 -0.1762
+
+2. Mass ~ Event * Time + Migratory Status + Agricultural Intensity + (1 | Species) (continuous)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Event * ts.sunrise + MigStatus + PercentAg + (1 | Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+    71.7    109.7    -23.8     47.7      164 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-3.770 -0.409 -0.038  0.374  4.982 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.0925   1.05    
+ Residual             0.0575   0.24    
+Number of obs: 176, groups:  Species, 9
+
+Fixed effects:
+                            Estimate Std. Error t value
+(Intercept)                  -0.0270     0.4708   -0.06
+EventFall_2023               -0.3249     0.0578   -5.62
+EventSpring_2022             -0.1614     0.1214   -1.33
+EventSpring_2023             -0.2654     0.0721   -3.68
+ts.sunrise                    0.4098     0.0956    4.29
+MigStatusResident             1.6136     0.7031    2.30
+PercentAg                     0.0318     0.0219    1.45
+EventFall_2023:ts.sunrise    -0.4570     0.0998   -4.58
+EventSpring_2022:ts.sunrise  -0.3963     0.1745   -2.27
+EventSpring_2023:ts.sunrise  -0.3575     0.1069   -3.34
+
+Correlation of Fixed Effects:
+            (Intr) EvF_2023 EvS_2022 EvS_2023 ts.snr MgSttR PrcntA EF_2023: ES_2022:
+EvntFl_2023 -0.095                                                                  
+EvntSp_2022 -0.051  0.443                                                           
+EvntSp_2023 -0.090  0.609    0.350                                                  
+ts.sunrise   0.001 -0.035   -0.021    0.063                                         
+MgSttsRsdnt -0.662  0.003   -0.008   -0.005   -0.007                                
+PercentAg   -0.012  0.209    0.307   -0.021   -0.089 -0.004                         
+EvnF_2023:.  0.005  0.016   -0.008   -0.104   -0.967  0.006  0.074                  
+EvnS_2022:.  0.006 -0.027   -0.616   -0.070   -0.553  0.005 -0.061  0.551           
+EvnS_2023:. -0.003  0.017   -0.007   -0.063   -0.894  0.010  0.177  0.874    0.505 
+
+
+                             2.5 %  97.5 %
+.sig01                       0.6975  1.8073
+.sigma                       0.2162  0.2680
+(Intercept)                 -1.0559  1.0024
+EventFall_2023              -0.4389 -0.2111
+EventSpring_2022            -0.4007  0.0779
+EventSpring_2023            -0.4075 -0.1233
+ts.sunrise                   0.2214  0.5983
+MigStatusResident            0.0756  3.1540
+PercentAg                   -0.0113  0.0749
+EventFall_2023:ts.sunrise   -0.6537 -0.2604
+EventSpring_2022:ts.sunrise -0.7405 -0.0524
+EventSpring_2023:ts.sunrise -0.5684 -0.1467
+
+
+
+3. Mass ~ Event * Time + Date * Migratory Status + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + (1 |      Species)
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+      72      113      -23       46      163 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-3.753 -0.327 -0.017  0.354  5.199 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.0833   1.041   
+ Residual             0.0569   0.239   
+Number of obs: 176, groups:  Species, 9
+
+Fixed effects:
+                                   Estimate Std. Error t value
+(Intercept)                         0.00509    0.46929    0.01
+EventFall_2023                     -0.38654    0.06713   -5.76
+EventSpring_2022                   -0.21078    0.11503   -1.83
+EventSpring_2023                   -0.28041    0.07482   -3.75
+ts.sunrise                          0.42084    0.09477    4.44
+DaysIntoSeason_S                    0.04659    0.02702    1.72
+MigStatusResident                   1.60227    0.70021    2.29
+EventFall_2023:ts.sunrise          -0.47389    0.09928   -4.77
+EventSpring_2022:ts.sunrise        -0.37644    0.17347   -2.17
+EventSpring_2023:ts.sunrise        -0.38538    0.10509   -3.67
+DaysIntoSeason_S:MigStatusResident -0.07023    0.04965   -1.41
+
+Correlation of Fixed Effects:
+            (Intr) EvF_2023 EvS_2022 EvS_2023 ts.snr DyIS_S MgSttR EF_2023: ES_2022: ES_2023:
+EvntFl_2023 -0.104                                                                           
+EvntSp_2022 -0.048  0.321                                                                    
+EvntSp_2023 -0.099  0.655    0.349                                                           
+ts.sunrise   0.001 -0.024    0.007    0.052                                                  
+DysIntSsn_S  0.041 -0.499    0.032   -0.227    0.007                                         
+MgSttsRsdnt -0.661  0.001   -0.007   -0.008   -0.007 -0.002                                  
+EvnF_2023:.  0.002  0.040   -0.034   -0.077   -0.966 -0.060  0.006                           
+EvnS_2022:.  0.004 -0.002   -0.629   -0.061   -0.562 -0.005  0.004  0.558                    
+EvnS_2023:.  0.002 -0.051   -0.063   -0.078   -0.890  0.036  0.012  0.866    0.520           
+DysIS_S:MSR  0.007 -0.057    0.004   -0.095    0.026 -0.308  0.019 -0.024   -0.033    0.057  
+
+                                     2.5 %  97.5 %
+.sig01                              0.69456  1.7996
+.sigma                              0.21515  0.2667
+(Intercept)                        -1.01990  1.0310
+EventFall_2023                     -0.51886 -0.2542
+EventSpring_2022                   -0.43754  0.0160
+EventSpring_2023                   -0.42786 -0.1329
+ts.sunrise                          0.23406  0.6078
+DaysIntoSeason_S                   -0.00669  0.0998
+MigStatusResident                   0.07076  3.1365
+EventFall_2023:ts.sunrise          -0.66968 -0.2782
+EventSpring_2022:ts.sunrise        -0.71864 -0.0346
+EventSpring_2023:ts.sunrise        -0.59263 -0.1783
+DaysIntoSeason_S:MigStatusResident -0.16811  0.0276
+
+
+
+4. Mass ~ Event * Time + (1 | Species)
+
+Linear mixed model fit by maximum likelihood  ['lmerMod']
+Formula: Mass ~ Event + ts.sunrise + (1 | Species) + Event * ts.sunrise
+   Data: birds.cs
+
+     AIC      BIC   logLik deviance df.resid 
+      74      106      -27       54      166 
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-3.800 -0.358 -0.056  0.349  5.080 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Species  (Intercept) 1.7220   1.312   
+ Residual             0.0583   0.241   
+Number of obs: 176, groups:  Species, 9
+
+Fixed effects:
+                            Estimate Std. Error t value
+(Intercept)                   0.7000     0.4409    1.59
+EventFall_2023               -0.3426     0.0569   -6.02
+EventSpring_2022             -0.2144     0.1163   -1.84
+EventSpring_2023             -0.2632     0.0726   -3.63
+ts.sunrise                    0.4222     0.0958    4.41
+EventFall_2023:ts.sunrise    -0.4675     0.1002   -4.67
+EventSpring_2022:ts.sunrise  -0.3795     0.1754   -2.16
+EventSpring_2023:ts.sunrise  -0.3856     0.1060   -3.64
+
+Correlation of Fixed Effects:
+            (Intr) EvF_2023 EvS_2022 EvS_2023 ts.snr EF_2023: ES_2022:
+EvntFl_2023 -0.098                                                    
+EvntSp_2022 -0.059  0.407                                             
+EvntSp_2023 -0.101  0.628    0.375                                    
+ts.sunrise  -0.005 -0.017    0.007    0.061                           
+EvnF_2023:.  0.010  0.000   -0.032   -0.103   -0.967                  
+EvnS_2022:.  0.009 -0.015   -0.629   -0.072   -0.561  0.558           
+EvnS_2023:.  0.007 -0.021   -0.066   -0.060   -0.896  0.877    0.525  
+
+
+                             2.5 %  97.5 %
+.sig01                       0.876  2.2680
+.sigma                       0.218  0.2698
+(Intercept)                 -0.262  1.6641
+EventFall_2023              -0.455 -0.2305
+EventSpring_2022            -0.444  0.0149
+EventSpring_2023            -0.406 -0.1201
+ts.sunrise                   0.233  0.6112
+EventFall_2023:ts.sunrise   -0.665 -0.2702
+EventSpring_2022:ts.sunrise -0.725 -0.0339
+EventSpring_2023:ts.sunrise -0.595 -0.1767
+
+-------------------------------
+
+# Clear violations of homoscedasticity. Tried various variance structures but inherent problem is wide differences in mass. Used log transformation of mass to stabilize model. Heteroscedasticity assumption now met across covariates. Slight violation with agricultural intensity covariate but not bad. Likely due to low sample size in low agricultural intensity wetland. Got slightly different top models but conclusions are the same. No impact of neonicotinoids or agricultural intensity on body mass. Below are top models and top model summaries:
+
+Model selection based on AICc:
+
+          K  AICc Delta_AICc AICcWt Cum.Wt     LL
+m84      13  9.41       0.00   0.22   0.22   9.42
+m114     14 10.40       0.98   0.14   0.36  10.11
+m44      11 10.60       1.19   0.12   0.49   6.50
+m45      11 10.63       1.22   0.12   0.61   6.49
+m85      12 11.51       2.10   0.08   0.69   7.20
+m14      10 12.32       2.90   0.05   0.74   4.51
+m87      12 12.89       3.48   0.04   0.78   6.51
+m16       7 13.74       4.33   0.03   0.80   0.46
+m99      14 14.20       4.79   0.02   0.83   8.24
+m48       9 14.25       4.84   0.02   0.85   2.42
+m46      11 14.54       5.12   0.02   0.86   4.54
+m65      12 15.54       6.13   0.01   0.87   5.22
+m2        6 15.56       6.14   0.01   0.88  -1.53
+m120     15 15.83       6.41   0.01   0.89   8.63
+m51       8 15.85       6.44   0.01   0.90   0.51
+m64      12 15.90       6.49   0.01   0.91   5.04
+m15       7 16.01       6.59   0.01   0.92  -0.67
+m88      12 16.22       6.81   0.01   0.93   4.89
+m90      10 16.25       6.83   0.01   0.93   2.54
+m115     14 16.80       7.38   0.01   0.94   6.97
+m29      11 17.22       7.81   0.00   0.94   3.22
+m100     13 17.44       8.03   0.00   0.95   5.44
+m17       7 17.61       8.20   0.00   0.95  -1.47
+m86      12 17.62       8.21   0.00   0.96   4.19
+m121     15 17.73       8.32   0.00   0.96   7.71
+m102     13 17.77       8.35   0.00   0.96   5.28
+m47      11 17.81       8.39   0.00   0.97   2.94
+m49       8 17.90       8.49   0.00   0.97  -0.52
+m126     15 17.99       8.58   0.00   0.97   7.57
+m103     13 18.00       8.59   0.00   0.97   5.18
+m117     13 18.57       9.15   0.00   0.98   4.89
+m31       8 18.71       9.29   0.00   0.98  -0.91
+m116     13 18.79       9.38   0.00   0.98   4.78
+m68      10 19.05       9.64   0.00   0.98   1.16
+m66      12 19.40       9.98   0.00   0.98   3.29
+m101     13 19.45      10.04   0.00   0.99   4.45
+m.global 16 19.46      10.04   0.00   0.99   8.07
+m67      12 19.59      10.17   0.00   0.99   3.21
+m52       8 19.94      10.52   0.00   0.99  -1.52
+m89      12 20.12      10.71   0.00   0.99   2.94
+m123     14 20.34      10.93   0.00   0.99   5.20
+m8        7 20.50      11.08   0.00   0.99  -2.91
+m71       9 20.75      11.34   0.00   0.99  -0.82
+m122     14 21.08      11.67   0.00   0.99   4.83
+m30       8 21.12      11.70   0.00   1.00  -2.12
+m105     11 21.28      11.86   0.00   1.00   1.19
+m91      10 21.56      12.14   0.00   1.00  -0.08
+m18       7 21.66      12.24   0.00   1.00  -3.48
+m104     13 21.89      12.47   0.00   1.00   3.24
+m72      12 21.94      12.52   0.00   1.00   2.04
+m93       9 22.13      12.72   0.00   1.00  -1.50
+m32       8 22.48      13.07   0.00   1.00  -2.80
+m50       8 22.90      13.49   0.00   1.00  -3.00
+m69       9 23.24      13.83   0.00   1.00  -2.06
+m118     11 23.68      14.27   0.00   1.00   0.00
+m106     11 23.74      14.32   0.00   1.00  -0.02
+m53       8 23.81      14.40   0.00   1.00  -3.46
+m33       8 24.37      14.96   0.00   1.00  -3.73
+m108     10 24.84      15.42   0.00   1.00  -1.72
+m92       9 24.94      15.53   0.00   1.00  -2.91
+m70       9 25.70      16.28   0.00   1.00  -3.28
+m124     12 26.01      16.59   0.00   1.00   0.00
+m73       9 26.51      17.09   0.00   1.00  -3.68
+m107     10 27.86      18.45   0.00   1.00  -3.23
+m60       7 30.49      21.08   0.00   1.00  -7.91
+m23       6 31.37      21.95   0.00   1.00  -9.44
+m94       8 32.46      23.05   0.00   1.00  -7.80
+m98       8 32.75      23.34   0.00   1.00  -7.93
+m24       5 33.03      23.61   0.00   1.00 -11.34
+m61       7 33.05      23.63   0.00   1.00  -9.18
+m54       7 33.12      23.70   0.00   1.00  -9.22
+m5        4 33.50      24.08   0.00   1.00 -12.63
+m4        4 33.65      24.24   0.00   1.00 -12.71
+m80       8 34.18      24.76   0.00   1.00  -8.64
+m95       8 34.63      25.21   0.00   1.00  -8.86
+m119      9 34.65      25.24   0.00   1.00  -7.76
+m55       6 35.05      25.63   0.00   1.00 -11.28
+m113      9 35.06      25.65   0.00   1.00  -7.96
+m62       6 35.16      25.74   0.00   1.00 -11.32
+m38       7 35.16      25.75   0.00   1.00 -10.24
+m26       5 35.25      25.84   0.00   1.00 -12.45
+m20       5 35.32      25.91   0.00   1.00 -12.48
+m27       5 35.33      25.91   0.00   1.00 -12.48
+m25       5 35.34      25.93   0.00   1.00 -12.49
+m.null    3 35.46      26.05   0.00   1.00 -14.66
+m19       5 35.49      26.08   0.00   1.00 -12.57
+m81       8 35.72      26.30   0.00   1.00  -9.41
+m109      9 36.29      26.88   0.00   1.00  -8.59
+m125     10 36.96      27.54   0.00   1.00  -7.78
+m74       8 37.07      27.65   0.00   1.00 -10.09
+m56       6 37.11      27.69   0.00   1.00 -12.29
+m7        4 37.12      27.70   0.00   1.00 -14.44
+m58       6 37.13      27.72   0.00   1.00 -12.31
+m57       6 37.15      27.74   0.00   1.00 -12.33
+m6        4 37.16      27.74   0.00   1.00 -14.46
+m96       7 37.17      27.75   0.00   1.00 -11.24
+m63       6 37.19      27.78   0.00   1.00 -12.34
+m3        4 37.25      27.84   0.00   1.00 -14.51
+m110      9 37.28      27.86   0.00   1.00  -9.07
+m39       6 37.38      27.96   0.00   1.00 -12.43
+m10       5 38.07      28.65   0.00   1.00 -13.85
+m82       7 38.08      28.66   0.00   1.00 -11.69
+m11       5 38.12      28.71   0.00   1.00 -13.88
+m40       6 38.42      29.01   0.00   1.00 -12.95
+m42       6 38.50      29.08   0.00   1.00 -12.99
+m22       5 38.89      29.47   0.00   1.00 -14.26
+m28       5 38.92      29.51   0.00   1.00 -14.28
+m21       5 39.03      29.62   0.00   1.00 -14.34
+m97       7 39.10      29.68   0.00   1.00 -12.20
+m75       7 39.53      30.12   0.00   1.00 -12.42
+m41       6 39.91      30.49   0.00   1.00 -13.70
+m1        4 40.04      30.63   0.00   1.00 -15.90
+m34       6 40.09      30.68   0.00   1.00 -13.79
+m111      8 40.11      30.70   0.00   1.00 -11.60
+m35       6 40.16      30.74   0.00   1.00 -13.82
+m76       7 40.22      30.80   0.00   1.00 -12.76
+m13       5 40.27      30.85   0.00   1.00 -14.95
+m78       7 40.33      30.91   0.00   1.00 -12.81
+m83       7 40.35      30.93   0.00   1.00 -12.82
+m59       6 40.80      31.39   0.00   1.00 -14.14
+m12       5 41.77      32.36   0.00   1.00 -15.70
+m77       7 42.01      32.59   0.00   1.00 -13.66
+m9        5 42.05      32.63   0.00   1.00 -15.84
+m43       6 42.05      32.64   0.00   1.00 -14.77
+m37       6 42.06      32.65   0.00   1.00 -14.77
+m112      8 42.28      32.86   0.00   1.00 -12.69
+m36       6 43.85      34.43   0.00   1.00 -15.67
+m79       7 43.96      34.54   0.00   1.00 -14.63
+
+
+1. Log(Mass) ~ Event * Time + Date * Migrant Status + (1 | Species)
+
+                                      2.5 %  97.5 %
+.sig01                              0.57794  1.4960
+.sigma                              0.17897  0.2218
+(Intercept)                        -0.88589  0.8193
+EventFall 2023                     -0.41280 -0.1926
+EventSpring 2022                   -0.33642  0.0408
+EventSpring 2023                   -0.32340 -0.0780
+ts.sunrise                          0.06663  0.3774
+DaysIntoSeason_S                    0.00832  0.0969
+MigStatusResident                   0.00174  2.5507
+EventFall 2023:ts.sunrise          -0.43667 -0.1111
+EventSpring 2022:ts.sunrise        -0.41386  0.1551
+EventSpring 2023:ts.sunrise        -0.36894 -0.0243
+DaysIntoSeason_S:MigStatusResident -0.13834  0.0245
+
+2. Log(Mass) ~ Event * Time + Date * Migrant Status + Agricultural Intensity + (1 | Species)
+
+                                     2.5 %  97.5 %
+.sig01                              0.5737  1.4854
+.sigma                              0.1783  0.2210
+(Intercept)                        -0.8588  0.8356
+EventFall 2023                     -0.4727 -0.2144
+EventSpring 2022                   -0.3906  0.0108
+EventSpring 2023                   -0.3376 -0.0894
+ts.sunrise                          0.0775  0.3895
+DaysIntoSeason_S                    0.0172  0.1243
+MigStatusResident                   0.0160  2.5469
+PercentAg                          -0.0704  0.0177
+EventFall 2023:ts.sunrise          -0.4518 -0.1240
+EventSpring 2022:ts.sunrise        -0.4028  0.1651
+EventSpring 2023:ts.sunrise        -0.3894 -0.0406
+DaysIntoSeason_S:MigStatusResident -0.1366  0.0257
+
+3. Log(Mass) ~ Event * Time + Date + (1 | Species)
+
+                                2.5 %  97.5 %
+.sig01                       0.718869  1.8584
+.sigma                       0.180003  0.2231
+(Intercept)                 -0.245743  1.3347
+EventFall 2023              -0.417576 -0.1965
+EventSpring 2022            -0.335360  0.0441
+EventSpring 2023            -0.331559 -0.0858
+ts.sunrise                   0.068969  0.3815
+DaysIntoSeason_S             0.000816  0.0856
+EventFall 2023:ts.sunrise   -0.440876 -0.1135
+EventSpring 2022:ts.sunrise -0.422104  0.1498
+EventSpring 2023:ts.sunrise -0.364362 -0.0183
+
+4. Log(Mass) ~ Event * Time + Migrant Status + (1 | Species)
+
+                              2.5 %  97.5 %
+.sig01                       0.5725  1.4822
+.sigma                       0.1822  0.2259
+(Intercept)                 -0.9096  0.7791
+EventFall 2023              -0.3400 -0.1522
+EventSpring 2022            -0.3460  0.0378
+EventSpring 2023            -0.2948 -0.0554
+ts.sunrise                   0.0642  0.3805
+MigStatusResident            0.0244  2.5498
+EventFall 2023:ts.sunrise   -0.4301 -0.0995
+EventSpring 2022:ts.sunrise -0.4210  0.1578
+EventSpring 2023:ts.sunrise -0.3745 -0.0247

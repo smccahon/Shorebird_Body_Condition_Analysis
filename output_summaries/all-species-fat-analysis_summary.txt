@@ -1,0 +1,150 @@
+This file serves as supportive documentation to Shelby McCahon's All Species fat analysis. 
+
+Date Created: 2024-12-02
+Date Modified: 2025-01-02
+
+-------------------------------
+
+Species tested (n = 6 species; n = 111 birds): 
+Lesser Yellowlegs (n = 43)
+Least Sandpiper (n = 25)
+Semipalmated Sandpiper (n = 12)
+Pectoral Sandpiper (n = 16)
+Killdeer (n = 10)
+Willet (n = 5)
+
+-------------------------------
+
+*Note: I excluded birds from spring 2022 and spring 2023. Analysis is only on fall birds. Event perfectly predicts fat. Analysis below excludes these birds (n = 114)
+
+*Note: Categorized fat into low (0-1) and high (2-6) and ran a logistic regression due to small sample size in higher level categories. 
+
+*Note: I had issues with model convergence ("boundary (singular) fit"). Species as a random effect had a variance very close to 0. I decided to treat species as a fixed effect rather than a random effect.
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- glm(Fat.G ~ DaysIntoSeason_S, data = birds.cs, family = "binomial")
+m2 <- glm(Fat.G ~ Julian, data = birds.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m1 2 149.30       0.00   0.53   0.53 -72.60
+m2 2 149.54       0.23   0.47   1.00 -72.71
+
+# Days into season performs better
+
+-------------------------------
+
+## Univariate Analysis: Agricultural Intensity ####
+
+m1 <- glm(Fat.G ~ PercentAg, data = birds.cs, family = "binomial")
+m2 <- glm(Fat.G ~ PercentAg + I(PercentAg^2), data = birds.cs, family = "binomial")
+m3 <- glm(Fat.G ~ AgIntensity, data = birds.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m1 2 153.25       0.00   0.55   0.55 -74.57
+m2 3 153.93       0.68   0.39   0.94 -73.85
+m3 3 157.52       4.28   0.06   1.00 -75.65
+
+# PercentAg as a continuous variable performs the best
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- glm(Fat.G ~ Event * ts.sunrise, data = birds.cs, family = "binomial")
+m2 <- glm(Fat.G ~ Event + ts.sunrise + I(ts.sunrise^2), data = birds.cs, family = "binomial")
+m3 <- glm(Fat.G ~ Event + ts.sunrise, data = birds.cs, family = "binomial")
+
+Model selection based on AICc:
+
+   K   AICc Delta_AICc AICcWt Cum.Wt     LL
+m1 4 147.83       0.00   0.71   0.71 -69.72
+m2 4 150.47       2.65   0.19   0.90 -71.05
+m3 3 151.71       3.88   0.10   1.00 -72.74
+
+# Model with interaction performs the best
+
+-------------------------------
+
+## Interaction Analysis: Date * Migratory Status ####
+
+m1 <- clmm(Fat ~ Julian + MigStatus + (1 | Species), data = birds.cs)
+m2 <- clmm(Fat ~ Julian * MigStatus + (1 | Species), data = birds.cs)
+
+Model selection based on AICc:
+
+    K   AICc Delta_AICc AICcWt Cum.Wt      LL
+m2 10 359.77       0.00   0.95   0.95 -168.79
+m1  9 365.52       5.74   0.05   1.00 -172.87
+
+# Model with interaction performs significantly better
+
+-------------------------------
+
+# INTERACTIONS/TRANSFORMATIONS INCLUDED: Event * Capture Time, Date * Migratory Status, PercentAg
+
+-------------------------------
+
+
+Model selection based on AICc:
+
+          K AICc Delta_AICc AICcWt Cum.Wt    LL
+m159      7  131       0.00   0.05   0.05 -57.7
+m73       8  131       0.02   0.05   0.11 -56.5
+m68       5  131       0.04   0.05   0.16 -60.0
+m129      9  131       0.22   0.05   0.21 -55.5
+m157      8  131       0.43   0.04   0.26 -56.7
+m124      9  131       0.86   0.04   0.29 -55.8
+m167      9  131       0.86   0.04   0.33 -55.8
+m120      6  131       0.94   0.03   0.36 -59.3
+m184      9  132       1.68   0.02   0.38 -56.2
+m103      6  132       1.78   0.02   0.41 -59.7
+m144      7  132       1.79   0.02   0.43 -58.6
+m181      8  132       1.92   0.02   0.45 -57.5
+m160      7  133       2.00   0.02   0.47 -58.7
+m164     11  133       2.10   0.02   0.49 -53.9
+m187     11  133       2.10   0.02   0.51 -53.9
+m75       8  133       2.14   0.02   0.53 -57.6
+m130      8  133       2.14   0.02   0.55 -57.6
+m113      6  133       2.14   0.02   0.57 -59.9
+m125      9  133       2.17   0.02   0.58 -56.4
+m115      5  133       2.19   0.02   0.60 -61.1
+.
+.
+.
+.
+
+
+-------------------------------
+
+# Top Model Results
+
+13 top models within 2 delta AICc
+
+Top conclusions:
+*Positive relationship between fat and date
+*Positive relationship between fat and agricultural intensity
+*Migrants have higher fat
+*Interaction between time and event on fat is significant
+
+-------------------------------
+
+All top models have an AUC > 0.7
+
+-------------------------------
+
+Linearity assumption holds for agricultural intensity
+
+
+
+
+
+
+
+
