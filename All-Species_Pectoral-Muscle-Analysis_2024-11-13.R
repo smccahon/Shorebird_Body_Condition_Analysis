@@ -498,13 +498,12 @@ m <- lmer(PecSizeBest ~ Detection + Event * ts.sunrise + MigStatus + (1|Species)
           data = birds, REML = FALSE)
 
 d <- expand.grid(Event = c("Fall 2023"),
-                 ts.sunrise = seq(min(birds$ts.sunrise), max(birds$ts.sunrise), 
-                                  length = 1000),
+                 ts.sunrise = mean(birds$ts.sunrise),
                  Detection = c("Detection", "Non-detection"),
                  MigStatus = c("Migratory"),
                  Species = unique(birds$Species))
 
-predictions <- predict(m, newdata = d, se.fit = TRUE, re.form = NULL)
+predictions <- predict(m, newdata = d, se.fit = TRUE)
 
 d$fit <- predictions$fit
 
@@ -522,13 +521,72 @@ d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs",
                                           "Least Sandpiper"))
 
 ggplot(d, aes(x = Detection, y = fit)) +
-  geom_point(size = 0.1, col = "black") +  # Points showing predicted values
-  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1,
-                col = "black",
-                size = 0.2) +  # Add confidence intervals
+  geom_point(size = 3, col = "black") +   # Points showing predicted values
+   geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1,
+                 col = "black",
+                 size = 1) +  
   theme_light() +
   labs(x = NULL, 
-       y = "Predicted Pectoral Muscle Size") +
+       y = expression("Predicted Pectoral Muscle Size" ~~~ (mm[score]))) +
+   theme(axis.title.x = element_text(size = 21,
+                                     margin = margin(t = 12)),
+         axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+         axis.text.x = element_text(size = 18),
+         axis.text.y = element_text(size = 18),
+         legend.position = "none",
+         strip.text = element_text(size = 18)) +
+   theme(legend.position = "none") + 
+   facet_wrap(~ Species)
+
+
+# goodness of fit
+library(lmerTest)
+m <- lmer(PecSizeBest ~ Detection + Event * ts.sunrise + MigStatus + (1|Species), 
+          data = birds, REML = FALSE)
+
+summary(m)
+
+# goodness of fit
+r.squaredGLMM(m)
+
+## LAB MEETING AG GRAPH ####
+m <- lmer(PecSizeBest ~ AgCategory + Detection + ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), 
+          REML = FALSE,
+          data = birds)
+
+d <- expand.grid(AgCategory = unique(birds$AgCategory),   
+                 Detection = c("Detection"),                    
+                 ts.sunrise = mean(birds$ts.sunrise),
+                 MigStatus = c("Migratory"),
+                 Species = unique(birds$Species),
+                 DaysIntoSeason_S = mean(birds$DaysIntoSeason_S))
+
+predictions <- predict(m, newdata = d, se.fit = TRUE)
+
+d$fit <- predictions$fit
+
+d$lwr <- d$fit - 1.96 * predictions$se.fit
+d$upr <- d$fit + 1.96 * predictions$se.fit
+
+d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs", 
+                                          "Pectoral Sandpiper", 
+                                          "Killdeer", 
+                                          "American Avocet", 
+                                          "Long-billed Dowitcher", 
+                                          "Willet", 
+                                          "Wilson's Phalarope", 
+                                          "Semipalmated Sandpiper",
+                                          "Least Sandpiper"))
+
+ggplot(d, aes(x = AgCategory, y = fit)) +
+  geom_point(size = 3, col = "black") +   # Points showing predicted values
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1,
+                col = "black",
+                size = 1) +  
+  theme_light() +
+  labs(x = "Agricultural Intensity", 
+       y = expression("Predicted Pectoral Muscle Size" ~~~ (mm[score]))) +
   theme(axis.title.x = element_text(size = 21,
                                     margin = margin(t = 12)),
         axis.title.y = element_text(size = 21,
@@ -540,9 +598,16 @@ ggplot(d, aes(x = Detection, y = fit)) +
   theme(legend.position = "none") + 
   facet_wrap(~ Species)
 
+# goodness of fit
+summary(m)
+r.squaredGLMM(m)
+ranef(m)
+
 
 # Pectoral Muscle ~ Event * ts.sunrise (holding all else constant)
-m110 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + Detection + (1|Species), data = birds, REML = FALSE)
+m110 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + Detection + (1|Species), 
+             data = birds, 
+             REML = FALSE)
 
 d <- expand.grid(Event = c("Spring 2022", "Spring 2023", "Fall 2023"),
                  ts.sunrise = seq(min(birds$ts.sunrise), max(birds$ts.sunrise), 

@@ -400,7 +400,7 @@ ggplot(d, aes(x = Detection, y = predicted_Mass)) +
                 size = 1) +  # Add confidence intervals
   theme_light() +
   labs(x = NULL, 
-       y = "Predicted Pectoral Muscle Size") +
+       y = expression("Predicted Pectoral Muscle Size" ~~~ (mm[score]))) +
   theme(axis.title.x = element_text(size = 21,
                                     margin = margin(t = 12)),
         axis.title.y = element_text(size = 21,

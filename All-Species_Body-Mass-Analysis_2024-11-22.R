@@ -967,9 +967,7 @@ ggplot(d, aes(x = Detection, y = Mass, fill = Event)) +
 m <- lmer(LogMass ~ Detection + Event * ts.sunrise + MigStatus + Sex + (1 | Species), 
           data = birds, REML = FALSE)
 
-d <- expand.grid(ts.sunrise = seq(min(birds$ts.sunrise), 
-                                 max(birds$ts.sunrise), 
-                                 length = 1000),   
+d <- expand.grid(ts.sunrise = mean(birds$ts.sunrise),   
                  Event = c("Fall 2023"),                    
                  Detection = c("Detection", "Non-detection"),
                  Sex = c("Female"),
@@ -998,10 +996,10 @@ d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs",
 
 
 ggplot(d, aes(x = Detection, y = predicted_Mass)) +
-  geom_point(size = 2, col = "black") +
+  geom_point(size = 3, col = "black") +
   geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
                 col = "black",
-                size = 0.4) +
+                size = 1) +
   theme_light() +
   facet_wrap(~ Species) +
   labs(x = NULL, 

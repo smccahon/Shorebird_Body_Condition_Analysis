@@ -1,7 +1,7 @@
 #-----------------------------------------#
 #  Lesser Yellowlegs Metabolite Analysis  #
 #          Created 11/20/2024             #          
-#         Modified 12/09/2024             #
+#         Modified 01/07/2025             #
 #-----------------------------------------#
 
 # load packages
@@ -660,4 +660,76 @@ plot(m)
 
 # Plasma Metabolite Profiles at Different Capture Sites ####
 
+# ---------------------------------------------------------------------------- #
 
+# LAB MEETING DETECTION GRAPH ####
+
+m <- lm(PC1 ~ Detection + ts.sunrise, data = leye)
+
+d <- expand.grid(Detection = unique(leye$Detection),                    
+                 ts.sunrise = mean(leye$ts.sunrise)) 
+
+predictions <- predict(m, newdata = d, se.fit = TRUE)
+
+d$predicted_Mass <- predictions$fit
+
+d$lower_CI <- d$predicted_Mass - 1.96 * predictions$se.fit
+d$upper_CI <- d$predicted_Mass + 1.96 * predictions$se.fit
+
+ggplot(d, aes(x = Detection, y = predicted_Mass)) +
+  geom_point(size = 5, col = "black") +  # Points showing predicted values
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
+                col = "black",
+                size = 1) +  # Add confidence intervals
+  theme_light() +
+  labs(x = NULL, 
+       y = "Predicted Lesser Yellowlegs Fattening Index") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red", size = 1)
+
+summary(m)
+
+# LAB MEETING AG INTENSITY GRAPH ####
+
+m <- lm(PC1 ~ PercentAg + ts.sunrise, data = leye)
+
+d <- expand.grid(PercentAg = seq(min(leye$PercentAg),
+                                 max(leye$PercentAg),
+                                 length = 1000),                    
+                 ts.sunrise = mean(leye$ts.sunrise)) 
+
+predictions <- predict(m, newdata = d, se.fit = TRUE)
+
+d$predicted_Mass <- predictions$fit
+
+d$lwr <- d$predicted_Mass - 1.96 * predictions$se.fit
+d$upr <- d$predicted_Mass + 1.96 * predictions$se.fit
+
+ggplot(d, aes(x = (PercentAg * 100), y = predicted_Mass)) +
+  geom_line(size = 0.8, col = "black") + 
+  geom_ribbon(aes(ymin = lwr, ymax = upr), 
+              alpha = 0.25, color = NA, show.legend = FALSE) +
+  theme_light() +
+  labs(x = "Surrounding Agricultural Intensity (%)", 
+       y = "Predicted Lesser Yellowlegs Fattening Index") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = seq(0, 100, by = 20)) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red", size = 1)
+
+summary(m)

@@ -1,7 +1,7 @@
 #----------------------------#
 #  All Species Fat Analysis  #
 #     Created 12/02/2024     #          
-#    Modified 01/02/2025     #
+#    Modified 01/07/2025     #
 #----------------------------#
 
 # load packages
@@ -669,4 +669,89 @@ ggplot(d, aes(x = PercentAg, y = fit)) +
         legend.position = "none") +
   theme(legend.position = "none")
 
+# LAB MEETING DETECTION GRAPH ####
+m <- glm(Fat.G ~ Detection + PercentAg + MigStatus + Event * ts.sunrise, 
+         data = birds, family = "binomial")
 
+d <- expand.grid(PercentAg = mean(birds$PercentAg),
+                 ts.sunrise = mean(birds$ts.sunrise),
+                 MigStatus = c("Migratory"),
+                 Event = c("Fall 2023"),
+                 Detection = c("Detection", "Non-detection"))
+
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+
+d$fit <- predictions$fit
+
+d$lwr <- predictions$fit - 1.96 * predictions$se.fit  # Lower CI
+d$upr <- predictions$fit + 1.96 * predictions$se.fit  # Upper CI
+
+ggplot(d, aes(x = Detection, y = fit)) +
+  geom_point(size = 5, col = "black") +  # Points showing predicted values
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1,
+                col = "black",
+                size = 1) +  # Add confidence intervals
+  theme_light() +
+  labs(x = NULL, 
+       y = "P(High Fat)") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none")
+
+summary(m)
+
+# Get predicted probabilities
+birds.s <- birds %>% 
+  filter(!is.na(Detection))
+
+predicted_probs <- predict(m, type = "response")
+
+# Create a ROC curve
+roc_curve <- roc(birds$Fat.G, predicted_probs)
+
+# AUC value
+auc_value <- auc(roc_curve)
+auc_value
+
+# LAB MEETING AG GRAPH ####
+m <- glm(Fat.G ~ Detection + PercentAg + MigStatus + Event * ts.sunrise, 
+         data = birds, family = "binomial")
+
+d <- expand.grid(PercentAg = seq(min(birds$PercentAg),
+                                     max(birds$PercentAg),
+                                     length = 1000),
+                 ts.sunrise = mean(birds$ts.sunrise),
+                 MigStatus = c("Migratory"),
+                 Event = c("Fall 2023"),
+                 Detection = c("Detection"))
+
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+
+d$fit <- predictions$fit
+
+d$lwr <- predictions$fit - 1.96 * predictions$se.fit  # Lower CI
+d$upr <- predictions$fit + 1.96 * predictions$se.fit  # Upper CI
+
+ggplot(d, aes(x = PercentAg, y = fit)) +
+  geom_line(size = 0.8, col = "black") + 
+  geom_ribbon(aes(ymin = lwr, ymax = upr), 
+              alpha = 0.25, color = NA, show.legend = FALSE) +
+  theme_light() +
+  labs(x ="Surrounding Agricultural Intensity (%)", 
+       y = "P(High Fat)") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = seq(0, 100, by = 20))
+
+summary(m)

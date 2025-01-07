@@ -1053,7 +1053,7 @@ plot(birds.c$PercentAg, residuals_vals, xlab = "Agricultural Intensity", ylab = 
 ## LAB MEETING PLOT DETECTION ####
 m <- lm(sc.mass ~ Detection + ts.sunrise + I(ts.sunrise^2) + Sex, data = birds)
 
-d <- expand.grid(Detection = unique(leye$Detection),                    
+d <- expand.grid(Detection = c("Detection", "Non-detection"),                    
                  ts.sunrise = mean(leye$ts.sunrise),
                  Sex = "Female") 
 

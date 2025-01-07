@@ -1,7 +1,7 @@
 #-----------------------------------#
 #  All Species Metabolite Analysis  #
 #          Created 12/02/2024       #          
-#         Modified 01/06/2025       #
+#         Modified 01/07/2025       #
 #-----------------------------------#
 
 # load packages
@@ -810,3 +810,104 @@ cor.test(birds$Mass, birds$Beta) # significantly negatively correlated
 
 cor.test(birds$Mass, birds$Tri) # significantly positively correlated
 
+# ---------------------------------------------------------------------------- #
+
+# LAB MEETING DETECTION GRAPH ####
+
+m <- lmer(PC1 ~ Detection + AgCategory + (1 | Species), data = birds, REML = FALSE)
+
+d <- expand.grid(
+  AgCategory = c("Moderate"),
+  Detection = unique(birds$Detection),
+  Species = unique(birds$Species))
+
+d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs", 
+                                          "Pectoral Sandpiper", 
+                                          "Killdeer", 
+                                          "American Avocet", 
+                                          "Long-billed Dowitcher", 
+                                          "Willet", 
+                                          "Wilson's Phalarope", 
+                                          "Semipalmated Sandpiper",
+                                          "Least Sandpiper"))
+
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+
+d$fit <- predictions$fit
+
+d$lower_CI <- predictions$fit - 1.96 * predictions$se.fit  # Lower CI
+d$upper_CI <- predictions$fit + 1.96 * predictions$se.fit  # Upper CI
+
+ggplot(d, aes(x = Detection, y = fit)) +
+  geom_point(size = 3) +  # Points showing predicted values
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
+                col = "black",
+                size = 1) +  # Add confidence intervals
+  theme_light() +
+  facet_wrap(~ Species) +
+  labs(x = NULL, 
+       y = "Predicted Fattening Index") +
+  theme(axis.title.x = element_text(size = 16,
+                                    margin = margin(t = 13)),
+        axis.title.y = element_text(size = 16,
+                                    margin = margin(r = 13)),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        legend.position = "none",
+        strip.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  geom_hline(size = 1, linetype = "dashed", col = "red", yintercept = 0)
+
+library(lmerTest)
+library(MuMIn)
+
+summary(m)
+r.squaredGLMM(m)
+
+# LAB MEETING AG GRAPH ####
+
+m <- lmer(PC1 ~ AgCategory + (1 | Species), data = birds, REML = FALSE)
+
+d <- expand.grid(
+  AgCategory = unique(birds$AgCategory),
+  Species = unique(birds$Species))
+
+d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs", 
+                                          "Pectoral Sandpiper", 
+                                          "Killdeer", 
+                                          "American Avocet", 
+                                          "Long-billed Dowitcher", 
+                                          "Willet", 
+                                          "Wilson's Phalarope", 
+                                          "Semipalmated Sandpiper",
+                                          "Least Sandpiper"))
+
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+
+d$fit <- predictions$fit
+
+d$lower_CI <- predictions$fit - 1.96 * predictions$se.fit  # Lower CI
+d$upper_CI <- predictions$fit + 1.96 * predictions$se.fit  # Upper CI
+
+ggplot(d, aes(x = AgCategory, y = fit)) +
+  geom_point(size = 3) +  # Points showing predicted values
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
+                col = "black",
+                size = 1) +  # Add confidence intervals
+  theme_light() +
+  facet_wrap(~ Species) +
+  labs(x = "Agricultural Intensity", 
+       y = "Predicted Fattening Index") +
+  theme(axis.title.x = element_text(size = 16,
+                                    margin = margin(t = 13)),
+        axis.title.y = element_text(size = 16,
+                                    margin = margin(r = 13)),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        legend.position = "none",
+        strip.text = element_text(size = 18)) +
+  theme(legend.position = "none") +
+  geom_hline(size = 1, linetype = "dashed", col = "red", yintercept = 0)
+
+summary(m)
+r.squaredGLMM(m)
