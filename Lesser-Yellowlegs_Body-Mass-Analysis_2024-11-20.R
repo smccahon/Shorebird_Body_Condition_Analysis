@@ -1,7 +1,7 @@
 #---------------------------------------#
 # Lesser Yellowlegs Body Mass Analysis  #
 #         Created 11/11/2024            #          
-#        Modified 01/06/2025            #
+#        Modified 01/20/2025            #
 #---------------------------------------#
 
 # load packages
@@ -20,7 +20,7 @@ library(car)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("Shorebird_Data_Cleaned_2024-12-9.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")

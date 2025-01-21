@@ -1,7 +1,7 @@
 #---------------------------------------#
 #  All Species Pectoral Muscle Analysis #
 #         Created 11/13/2024            #          
-#         Modified 01/04/2024           #
+#         Modified 01/20/2024           #
 #---------------------------------------#
 
 # load packages
@@ -22,7 +22,7 @@ library(MuMIn)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("Shorebird_Data_Cleaned_2024-12-9.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")
@@ -266,7 +266,7 @@ models <- mget(model_names)
 
 aictab(models, modnames = model_names)
 
-# Categorical predictor performs better
+# continuous predictor performs significantly better
 
 # ---------------------------------------------------------------------------- #
 
@@ -302,7 +302,7 @@ aictab(models, modnames = model_names)
 # ---------------------------------------------------------------------------- #
 
 m.global <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + 
-                   MigStatus + AgCategory + Detection +
+                   MigStatus + PercentAg + Detection +
                    MigStatus * DaysIntoSeason_S +
                    Event * ts.sunrise + (1 | Species), REML = FALSE, data = birds.cs)
 
@@ -315,7 +315,7 @@ m2 <- lmer(PecSizeBest ~ Event + (1|Species), data = birds.cs, REML = FALSE)
 m3 <- lmer(PecSizeBest ~ ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
 m4 <- lmer(PecSizeBest ~ DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m5 <- lmer(PecSizeBest ~ MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m6 <- lmer(PecSizeBest ~ AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m6 <- lmer(PecSizeBest ~ PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m7 <- lmer(PecSizeBest ~ Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 ##  Additive Models ####
@@ -326,144 +326,144 @@ m8 <- lmer(PecSizeBest ~ Sex + Event + (1|Species), data = birds.cs, REML = FALS
 m9 <- lmer(PecSizeBest ~ Sex + ts.sunrise + (1|Species), data = birds.cs, REML = FALSE)
 m10 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m11 <- lmer(PecSizeBest ~ Sex + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m12 <- lmer(PecSizeBest ~ Sex + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m12 <- lmer(PecSizeBest ~ Sex + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m13 <- lmer(PecSizeBest ~ Sex + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m14 <- lmer(PecSizeBest ~ Event + ts.sunrise + (1|Species) + Event*ts.sunrise, data = birds.cs, REML = FALSE)
 m15 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m16 <- lmer(PecSizeBest ~ Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m17 <- lmer(PecSizeBest ~ Event + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m17 <- lmer(PecSizeBest ~ Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m18 <- lmer(PecSizeBest ~ Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m19 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m20 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m21 <- lmer(PecSizeBest ~ ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m21 <- lmer(PecSizeBest ~ ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m22 <- lmer(PecSizeBest ~ ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m23 <- lmer(PecSizeBest ~ DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
-m24 <- lmer(PecSizeBest ~ DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m24 <- lmer(PecSizeBest ~ DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m25 <- lmer(PecSizeBest ~ DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m26 <- lmer(PecSizeBest ~ MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m26 <- lmer(PecSizeBest ~ MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m27 <- lmer(PecSizeBest ~ MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m28 <- lmer(PecSizeBest ~ AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m28 <- lmer(PecSizeBest ~ PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 ### Three Additive Combinations ####
 
 m29 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + (1|Species) + Event * ts.sunrise, data = birds.cs, REML = FALSE)
 m30 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m31 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m32 <- lmer(PecSizeBest ~ Sex + Event + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m32 <- lmer(PecSizeBest ~ Sex + Event + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m33 <- lmer(PecSizeBest ~ Sex + Event + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m34 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m35 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m36 <- lmer(PecSizeBest ~ Sex + ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m36 <- lmer(PecSizeBest ~ Sex + ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m37 <- lmer(PecSizeBest ~ Sex + ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m38 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + MigStatus + (1|Species) + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
-m39 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m39 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m40 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m41 <- lmer(PecSizeBest ~ Sex + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m41 <- lmer(PecSizeBest ~ Sex + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m42 <- lmer(PecSizeBest ~ Sex + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m43 <- lmer(PecSizeBest ~ Sex + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m43 <- lmer(PecSizeBest ~ Sex + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m44 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m45 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m46 <- lmer(PecSizeBest ~ Event * ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m46 <- lmer(PecSizeBest ~ Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m47 <- lmer(PecSizeBest ~ Event * ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m48 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m49 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m49 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m50 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m51 <- lmer(PecSizeBest ~ Event + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m51 <- lmer(PecSizeBest ~ Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m52 <- lmer(PecSizeBest ~ Event + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m53 <- lmer(PecSizeBest ~ Event + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m53 <- lmer(PecSizeBest ~ Event + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m54 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m55 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m55 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m56 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m57 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m57 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m58 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m59 <- lmer(PecSizeBest ~ ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m60 <- lmer(PecSizeBest ~ DaysIntoSeason_S * MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m59 <- lmer(PecSizeBest ~ ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m60 <- lmer(PecSizeBest ~ DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m61 <- lmer(PecSizeBest ~ DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m62 <- lmer(PecSizeBest ~ DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m63 <- lmer(PecSizeBest ~ MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m62 <- lmer(PecSizeBest ~ DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m63 <- lmer(PecSizeBest ~ MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 ### Four Additive Combinations ####
 
 m64 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + (1|Species), data = birds.cs, REML = FALSE)
 m65 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m66 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m66 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m67 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m68 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m69 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m69 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m70 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m71 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m71 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m72 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m73 <- lmer(PecSizeBest ~ Sex + Event + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m73 <- lmer(PecSizeBest ~ Sex + Event + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m74 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m75 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m75 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m76 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m77 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m77 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m78 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m79 <- lmer(PecSizeBest ~ Sex + ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m80 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S * MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m79 <- lmer(PecSizeBest ~ Sex + ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m80 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m81 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m82 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m83 <- lmer(PecSizeBest ~ Sex + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m82 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m83 <- lmer(PecSizeBest ~ Sex + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 m84 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + (1|Species), data = birds.cs, REML = FALSE)
-m85 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m85 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m86 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m87 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m87 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m88 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m89 <- lmer(PecSizeBest ~ Event * ts.sunrise + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m90 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m89 <- lmer(PecSizeBest ~ Event * ts.sunrise + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m90 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m91 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m92 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m93 <- lmer(PecSizeBest ~ Event + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m94 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m92 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m93 <- lmer(PecSizeBest ~ Event + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m94 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m95 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m96 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m97 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m98 <- lmer(PecSizeBest ~ DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m96 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m97 <- lmer(PecSizeBest ~ ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m98 <- lmer(PecSizeBest ~ DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 ### Five Additive Combinations ####
 
 m99 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + (1|Species) +
               DaysIntoSeason_S * MigStatus + Event * ts.sunrise, data = birds.cs, REML = FALSE)
-m100 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + AgCategory + (1|Species) +
+m100 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + PercentAg + (1|Species) +
                Event * ts.sunrise, data = birds.cs, REML = FALSE)
 m101 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + (1|Species) +
                Event * ts.sunrise, data = birds.cs, REML = FALSE)
-m102 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + MigStatus + AgCategory + (1|Species) +
+m102 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + MigStatus + PercentAg + (1|Species) +
                Event * ts.sunrise, data = birds.cs, REML = FALSE)
 m103 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + MigStatus + Detection + (1|Species) +
                Event * ts.sunrise, data = birds.cs, REML = FALSE)
-m104 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + AgCategory + Detection + (1|Species) +
+m104 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + PercentAg + Detection + (1|Species) +
                Event * ts.sunrise, data = birds.cs, REML = FALSE)
-m105 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species) +
+m105 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
                DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
 m106 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
                + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
-m107 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m108 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m109 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species) +
+m107 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m108 <- lmer(PecSizeBest ~ Sex + Event + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m109 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
                DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
 m110 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + MigStatus + Detection + (1|Species) +
                DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
-m111 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m112 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m113 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m114 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + AgCategory + (1|Species), data = birds.cs, REML = FALSE)
+m111 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m112 <- lmer(PecSizeBest ~ Sex + ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m113 <- lmer(PecSizeBest ~ Sex + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m114 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + (1|Species), data = birds.cs, REML = FALSE)
 m115 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m116 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m117 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m118 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m119 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m116 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m117 <- lmer(PecSizeBest ~ Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m118 <- lmer(PecSizeBest ~ Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m119 <- lmer(PecSizeBest ~ ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 ### Six Additive Combinations ####
 
-m120 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + AgCategory + (1|Species) +
+m120 <- lmer(PecSizeBest ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + MigStatus + PercentAg + (1|Species) +
                Event * ts.sunrise + DaysIntoSeason_S * MigStatus, data = birds.cs, REML = FALSE)
 m121 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + DaysIntoSeason_S * MigStatus + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m122 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m123 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m124 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m125 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
-m126 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + AgCategory + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m122 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m123 <- lmer(PecSizeBest ~ Sex + Event * ts.sunrise + MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m124 <- lmer(PecSizeBest ~ Sex + Event + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m125 <- lmer(PecSizeBest ~ Sex + ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
+m126 <- lmer(PecSizeBest ~ Event * ts.sunrise + DaysIntoSeason_S * MigStatus + PercentAg + Detection + (1|Species), data = birds.cs, REML = FALSE)
 
 # ---------------------------------------------------------------------------- #
 

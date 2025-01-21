@@ -1,0 +1,189 @@
+This file serves as supportive documentation to Shelby McCahon's Lesser Yellowlegs uric acid analysis. 
+
+Date Created: 2025-01-20
+
+-------------------------------
+
+Species tested: Lesser Yellowlegs (n = 29)
+
+-------------------------------
+
+ Lesser Yellowlegs Modeling ####
+
+## Univariate Analysis: Date ####
+
+m1 <- lm(Uric ~ DaysIntoSeason_S, data = leye.cs)
+m2 <- lm(Uric ~ Julian, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 3 87.3       0.00   0.61   0.61 -40.2
+m1 3 88.2       0.87   0.39   1.00 -40.6
+
+# Julian performs better (wt = 0.61) but use date into season for consistency
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lm(Uric ~ Event * ts.sunrise, data = leye.cs)
+m2 <- lm(Uric ~ Event + ts.sunrise, data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m2 5 82.3       0.00   0.96   0.96 -34.8
+m1 7 88.6       6.34   0.04   1.00 -34.6
+
+# Model without interaction performs significantly better
+
+-------------------------------
+
+## Best Time Variable: Time or Time^2 ####
+
+m1 <- lm(Uric ~ ts.sunrise, data = leye.cs)
+m2 <- lm(Uric ~ ts.sunrise + I(ts.sunrise^2), data = leye.cs)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt    LL
+m1 3 80.0       0.00   0.75   0.75 -36.5
+m2 4 82.3       2.23   0.25   1.00 -36.3
+
+-------------------------------
+
+## Single Models ####
+
+m.global <- lm(Uric ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+               data = leye.cs)
+
+m.null <- lm(Uric ~ 1, data = leye.cs)
+
+m1 <- lm(Uric ~ Sex, data = leye.cs)
+m2 <- lm(Uric ~ Event, data = leye.cs)
+m3 <- lm(Uric ~ DaysIntoSeason_S, data = leye.cs)
+m4 <- lm(Uric ~ ts.sunrise, data = leye.cs)
+m5 <- lm(Uric ~ PercentAg, data = leye.cs)
+m6 <- lm(Uric ~ Detection, data = leye.cs)
+
+## Additive Models ####
+
+### Two additive combinations ####
+m7 <- lm(Uric ~ Sex + Event, data = leye.cs)
+m8 <- lm(Uric ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m9 <- lm(Uric ~ Sex + ts.sunrise, data = leye.cs)
+m10 <- lm(Uric ~ Sex + PercentAg, data = leye.cs)
+m11 <- lm(Uric ~ Sex + Detection, data = leye.cs)
+m12 <- lm(Uric ~ Event + DaysIntoSeason_S, data = leye.cs)
+m13 <- lm(Uric ~ Event + ts.sunrise, data = leye.cs)
+m14 <- lm(Uric ~ Event + PercentAg, data = leye.cs)
+m15 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m16 <- lm(Uric ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m17 <- lm(Uric ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m18 <- lm(Uric ~ ts.sunrise + PercentAg, data = leye.cs)
+m19 <- lm(Uric ~ ts.sunrise + Detection, data = leye.cs)
+m20 <- lm(Uric ~ PercentAg + Detection, data = leye.cs)
+
+### Three additive combinations ####
+m21 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m22 <- lm(Uric ~ Sex + Event + ts.sunrise, data = leye.cs)
+m23 <- lm(Uric ~ Sex + Event + PercentAg, data = leye.cs)
+m24 <- lm(Uric ~ Sex + Event + Detection, data = leye.cs)
+m25 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m26 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m27 <- lm(Uric ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m28 <- lm(Uric ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m29 <- lm(Uric ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m30 <- lm(Uric ~ Sex + PercentAg + Detection, data = leye.cs)
+m31 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(Uric ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(Uric ~ Event + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(Uric ~ Event + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(Uric ~ Event + PercentAg + Detection, data = leye.cs)
+m37 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m38 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m39 <- lm(Uric ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m40 <- lm(Uric ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Four additive combinations ####
+m41 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m42 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m43 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m44 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
+m45 <- lm(Uric ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
+m46 <- lm(Uric ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m47 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m48 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m49 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m50 <- lm(Uric ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m51 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m52 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m53 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m54 <- lm(Uric ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m55 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+### Five additive combinations ####
+
+m56 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m57 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m58 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m59 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m60 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m61 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
+-------------------------------
+
+Model selection based on AICc:
+
+         K  AICc Delta_AICc AICcWt Cum.Wt    LL
+m4       3  80.0       0.00   0.28   0.28 -36.5
+m13      5  82.3       2.25   0.09   0.37 -34.8
+m9       4  82.4       2.39   0.08   0.45 -36.4
+m18      4  82.5       2.51   0.08   0.53 -36.4
+m19      4  82.6       2.58   0.08   0.60 -36.5
+m15      4  82.7       2.70   0.07   0.68 -36.5
+m31      6  84.2       4.22   0.03   0.71 -34.2
+m35      6  85.0       4.96   0.02   0.73 -34.6
+m34      6  85.1       5.09   0.02   0.75 -34.6
+m28      5  85.2       5.17   0.02   0.77 -36.3
+m22      6  85.3       5.28   0.02   0.79 -34.8
+m29      5  85.3       5.31   0.02   0.81 -36.4
+m25      5  85.4       5.33   0.02   0.83 -36.4
+m40      5  85.4       5.35   0.02   0.85 -36.4
+m37      5  85.4       5.37   0.02   0.87 -36.4
+m38      5  85.5       5.52   0.02   0.89 -36.5
+m.null   2  85.7       5.71   0.02   0.90 -40.6
+.
+.
+.
+
+Top Model:
+
+Uric ~ Time
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.6526 -0.5279 -0.0285  0.5992  2.0013 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+(Intercept) -1.90e-16   1.64e-01    0.00   1.0000   
+ts.sunrise   4.97e-01   1.67e-01    2.97   0.0061 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.884 on 27 degrees of freedom
+Multiple R-squared:  0.247,	Adjusted R-squared:  0.219 
+F-statistic: 8.83 on 1 and 27 DF,  p-value: 0.00615
+
+             2.5 % 97.5 %
+(Intercept) -0.337  0.337
+ts.sunrise   0.154  0.839
+
+## Linear relationship may not be the best but still overall good fit. GAM would likely be better.
+## Detection and agricultural intensity have no effect on uric acid levels
+
+
+

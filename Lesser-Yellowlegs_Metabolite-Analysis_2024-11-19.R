@@ -1,7 +1,7 @@
 #-----------------------------------------#
 #  Lesser Yellowlegs Metabolite Analysis  #
 #          Created 11/20/2024             #          
-#         Modified 01/07/2025             #
+#         Modified 01/20/2025             #
 #-----------------------------------------#
 
 # load packages
@@ -20,7 +20,7 @@ library(car)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("Shorebird_Data_Cleaned_2024-12-9.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")
@@ -129,7 +129,7 @@ head(leye)
 
 # Data Visualization ####
 
-# Fattening Index ~ Detection
+# Fattening Index ~ Detection (no relationship)
 ggplot(leye.cs, 
        aes(x = Detection, y = PC1, fill = Detection)) +
   geom_boxplot(outlier.shape = NA) +  
@@ -156,36 +156,12 @@ ggplot(leye.cs,
                         option = "inferno", 
                         alpha = 0.8) 
 
-# Fattening Index ~ log(PercentAg) ####
+# Uric Acid ~ PercentAg (no clear relationship)
 ggplot(leye, 
-       aes(x = LogAg, y = PC1)) +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed",
-             size = 1) +
-  geom_boxplot(outlier.shape = NA) +  
-  geom_jitter(aes(color = ts.sunrise),
-              position = position_jitterdodge(jitter.width = 0.2),  
-              size = 2, 
-              alpha = 0.8) + 
-  theme_light() +
-  labs(x = "Agricultural Intensity", 
-       y = "Lesser Yellowlegs Fattening Index") +  
-  theme(axis.title.x = element_text(size = 14,
-                                    margin = margin(t = 13)),
-        axis.title.y = element_text(size = 14,
-                                    margin = margin(r = 13)),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12),
-        legend.position = "none") +
-  scale_color_viridis_c(option = "inferno", 
-                        alpha = 0.8)
-
-# for presentation
-ggplot(leye, 
-       aes(x = AgCategory, y = PC1)) + 
-  geom_boxplot(outlier.shape = NA, fill = "#F1CCB5") + 
+       aes(x = PercentAg, y = Uric)) + 
   geom_point(size = 2, alpha = 0.4, color = "black") +
   labs(x = "Surrounding Agricultural Intensity", 
-       y = "Lesser Yellowlegs Fattening Index") +  
+       y = "LEYE Uric Acid Level (umol/L)") +  
   theme_classic() +
   theme(text = element_text(size = 20),
         legend.text = element_text(size = 18),
@@ -194,9 +170,9 @@ ggplot(leye,
         axis.text.x = element_text(size = 18),
         axis.title.y = element_text(margin = margin(r = 10)),
         axis.title.x = element_text(margin = margin(t = 10))) +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed",
-             size = 1) +
-  scale_x_discrete(labels = c("Low <25%", "Moderate (25-50%)", "High (>75%)"))
+  scale_x_continuous(
+    breaks = seq(0, 1, by = 0.1),
+    labels = scales::percent)
 
 
 # Fattening index ~ Percent Ag ####
@@ -407,6 +383,11 @@ models$m.global <- m.global
 model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
+
+# NEW SUMMARIES 2025-01-20 ####
+confint(m18) # time and ag significant (negative)...
+confint(m37) # time and ag significant (negative)...
+confint(m28) # time and ag significant (negative)...
 
 # ---------------------------------------------------------------------------- #
 
@@ -656,6 +637,11 @@ plot(m)
 
 # ASSESS WHETHER I SHOULD DO GAM OR ANOTHER NONLINEAR MODEL
 
+m <- lm(PC1 ~ ts.sunrise + PercentAg, data = leye.cs)
+summary(m)
+par(mfrow = c(2,2))
+plot(m)
+
 # ---------------------------------------------------------------------------- #
 
 # Plasma Metabolite Profiles at Different Capture Sites ####
@@ -733,3 +719,5 @@ ggplot(d, aes(x = (PercentAg * 100), y = predicted_Mass)) +
              color = "red", size = 1)
 
 summary(m)
+
+

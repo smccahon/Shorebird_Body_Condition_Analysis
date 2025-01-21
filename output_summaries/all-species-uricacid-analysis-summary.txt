@@ -1,0 +1,64 @@
+This file serves as supportive documentation to Shelby McCahon's All Species uric acid analysis. 
+
+Date Modified: 2025-01-20
+
+-------------------------------
+
+Species tested (n = 8 species; n = 85 birds): 
+Lesser Yellowlegs (n = 29)
+Least Sandpiper (n = 4)
+Semipalmated Sandpiper (n = 8)
+Wilson's Phalarope (n = 17)
+Pectoral Sandpiper (n = 8)
+Killdeer (n = 9)
+Willet (n = 4)
+Long-billed Dowitcher (n = 6)
+
+-------------------------------
+
+## Univariate Analysis: Date ####
+
+m1 <- lmer(Uric ~ DaysIntoSeason_S + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Uric ~ Julian + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2 4  246       0.00   0.58   0.58 -119
+m1 4  246       0.61   0.42   1.00 -119
+
+# Both perform similarly; use date into season for consistency
+
+-------------------------------
+
+## Interaction Analysis: Event and Capture Time ####
+
+m1 <- lmer(Uric ~ Event * ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Uric ~ Event + ts.sunrise + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+    K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2  7  245       0.00   0.91   0.91 -115
+m1 10  249       4.57   0.09   1.00 -113
+
+# Model without interaction performs significantly better
+
+-------------------------------
+
+## Interaction Analysis: Date * Migratory Status ####
+
+m1 <- lmer(Uric ~ DaysIntoSeason_S + MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+m2 <- lmer(Uric ~ DaysIntoSeason_S * MigStatus + (1 | Species), data = birds.cs, REML = FALSE)
+
+Model selection based on AICc:
+
+   K AICc Delta_AICc AICcWt Cum.Wt   LL
+m2 6  237       0.00    0.9    0.9 -112
+m1 5  241       4.49    0.1    1.0 -115
+
+-------------------------------
+
+# did analysis with species as a fixed effect (very low variance suggests random effect is not needed) and a random effect and got the same conclusions.
+
+time and date * migstatus are significant

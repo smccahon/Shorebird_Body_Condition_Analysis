@@ -1,7 +1,7 @@
 #----------------------------#
 #  All Species Fat Analysis  #
 #     Created 12/02/2024     #          
-#    Modified 01/07/2025     #
+#    Modified 01/20/2025     #
 #----------------------------#
 
 # load packages
@@ -24,7 +24,7 @@ library(pscl)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("Shorebird_Data_Cleaned_2024-12-9.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")
@@ -498,6 +498,12 @@ models$m.global <- m.global
 model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
+
+# NEW RESULTS 2025-01-20 ####
+confint(m73) # positive relationship between fat and date
+confint(m68) # date * migratory status significant
+confint(m157) # event * time significant
+confint(m103) # date * migratory status significant
 
 # ---------------------------------------------------------------------------- #
 

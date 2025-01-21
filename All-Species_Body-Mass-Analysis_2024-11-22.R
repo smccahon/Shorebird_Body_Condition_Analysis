@@ -1,7 +1,7 @@
 #---------------------------------#
 # All Species Body Mass Analysis  #
 #         Created 11/11/2024      #          
-#         Modified 01/06/2025     #
+#         Modified 01/20/2025     #
 #---------------------------------#
 
 # load packages
@@ -715,6 +715,20 @@ models$m.global <- m.global
 model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
+
+# NEW TOP RESULTS 2025-01-20 ####
+summary(m84)
+confint(m84) # event * time significant
+
+summary(m114)
+confint(m114) # percentag in model but not significant; event * time significant
+
+summary(m44)
+confint(m44) # date and event * time significant
+
+summary(m45)
+confint(m45) # migratory status and event * time significant
+
 
 # ---------------------------------------------------------------------------- #
 

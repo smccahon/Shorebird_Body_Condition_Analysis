@@ -1,7 +1,7 @@
 #---------------------------------------------#
 #  Lesser Yellowlegs Pectoral Muscle Analysis #
 #           Created 11/11/2024                #          
-#           Modified 01/06/2025               #
+#           Modified 01/20/2025               #
 #---------------------------------------------#
 
 # load packages
@@ -21,7 +21,7 @@ library(viridis)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("Shorebird_Data_Cleaned_2024-12-9.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")
@@ -80,6 +80,10 @@ leye <- subset(birds, Species %in% c("LesserYellowlegs"))
 # Filter data that only contain pectoral muscle scores
 leye <- leye %>% 
   filter(!is.na(PecSizeBest))
+
+# Subset data for detections to look at interesting result
+detect <- subset(leye, Detection %in% c("Detection"))
+nondetect <- subset(leye, Detection %in% c("Non-detection"))
 
 # Standardize continuous variables
 leye.cs <- leye %>%
@@ -344,6 +348,13 @@ model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
 
+# NEW RESULTS 2025-01-20 ####
+confint(m20) # detection and percent ag significant
+summary(m20)
+confint(m40) # detection and percent ag significant
+confint(m5) # percent ag significant
+confint(m6) # detection significant
+
 # ---------------------------------------------------------------------------- #
 
 # Top Model Summaries: All Models ####
@@ -436,9 +447,54 @@ ggplot(d, aes(x = (PercentAg * 100), y = fit, color = Detection)) +
         axis.text.y = element_text(size = 18),
         legend.position = "none") +
   theme(legend.position = "none") +
-  scale_x_continuous(breaks = seq(0, 100, by = 20)) +
-  
+  scale_x_continuous(breaks = seq(0, 100, by = 20))
 
+
+
+ggplot(d, aes(x = (PercentAg * 100), y = fit)) +
+  geom_line(size = 0.8) + 
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Detection), 
+              alpha = 0.25, color = NA, show.legend = FALSE) +
+  theme_light() +
+  labs(x = "Surrounding Agricultural Intensity (%)", 
+       y = expression("LEYE Predicted Pectoral Muscle Size" ~~~ (mm[score]))) +
+  theme(axis.title.x = element_text(size = 17,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 17,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = seq(0, 100, by = 20))
+  
+m <- lm(PecSizeBest ~ Detection + PercentAg, data = leye)
+summary(m)
+plot(m)
+
+d <- expand.grid(Detection = c("Non-detection"),
+                 PercentAg = seq(min(leye$PercentAg),
+                                 max(leye$PercentAg),
+                                 length = 1000)) 
+
+d <- cbind(d, predict(m, newdata = d, interval = "confidence"))
+
+ggplot(d, aes(x = (PercentAg * 100), y = fit)) +
+  geom_line(size = 0.8) + 
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Detection), 
+              alpha = 0.25, color = NA, show.legend = FALSE) +
+  theme_light() +
+  labs(x = "Surrounding Agricultural Intensity (%)", 
+       y = "Predicted Pectoral Muscle Size") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = seq(0, 100, by = 20))
 
 # Pectoral ~ Detection
 m <- lm(PecSizeBest ~ Detection, data = leye)
@@ -476,6 +532,38 @@ ggplot(d, aes(x = Detection, y = fit)) +
   theme_light() +
   labs(x = "Neonicotinoid Detection",
        y = expression("Lesser Yellowlegs Breast Muscle Size" ~~~ (mm[score])))
+
+# Pectoral ~ Detection + Ag (TOP MODEL 2025-01-20) ####
+m <- lm(PecSizeBest ~ Detection + PercentAg, data = leye)
+summary(m)
+
+d <- expand.grid(Detection = unique(leye$Detection),
+                 PercentAg = mean(leye$PercentAg))
+
+predictions <- predict(m, newdata = d, se.fit = TRUE)
+
+d$predicted_Mass <- predictions$fit
+
+d$lower_CI <- d$predicted_Mass - 1.96 * predictions$se.fit
+d$upper_CI <- d$predicted_Mass + 1.96 * predictions$se.fit
+
+ggplot(d, aes(x = Detection, y = predicted_Mass, color = Detection)) +
+  geom_point(size =3,
+             col = "black") +  # Points showing predicted values
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
+                col = "black",
+                size = 0.7) +  # Add confidence intervals
+  theme_classic() +
+  labs(x = "Neonicotinoid Detection", 
+       y = "Predicted LEYE Breast Muscle Size" ~~~ (mm[score])) +
+  theme(axis.title.x = element_text(size = 16,
+                                    margin = margin(t = 13)),
+        axis.title.y = element_text(size = 16,
+                                    margin = margin(r = 13)),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        legend.position = "none") +
+  theme(legend.position = "none")
 
 
 # Pectoral ~ Detection
@@ -678,3 +766,20 @@ abline(h = 4/(length(resid(m)) - length(coef(m))), col = "red")  # Threshold for
 ## Pectoral ~ Date + Detection
 m <- lm(PecSizeBest ~ DaysIntoSeason_S + Detection, data = leye.cs)
 plot(m)
+
+
+#------------------------------------------------------------------------#
+ 
+# IS DETECTION AND SEASON CORRELATED? ####
+m <- glm(Detection ~ Event, data = leye, family = "binomial") 
+# can't do this because birds with detections are in spring 2022 or fall 2023
+# and birds without detections are fall 2023
+confint(m)
+
+# ARE DETECTIONS IN BIRDS AND AGRICULTURAL INTENSITY CORRELATED?? ####
+m <- glm(Detection ~ PercentAg, data = birds, family = "binomial") # NO
+confint(m)
+
+ggplot(data = birds %>% filter(!is.na(Detection)), aes(x = Detection, y = PercentAg)) +
+  geom_boxplot()
+

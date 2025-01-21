@@ -20,7 +20,7 @@ library(car)
 
 # Read data
 setwd("processed_data")
-birds <- read.csv("LM_ShorebirdsALLNeg.csv")
+birds <- read.csv("Shorebird_Data_Cleaned_2025-01-20.csv")
 
 # Make neonicotinoid detection column (Detection/Non-detection)
 birds$Detection <- ifelse(birds$OverallNeonic > 0, "Detection", "Non-detection")
@@ -367,12 +367,14 @@ model_names <- paste0("m", 1:93)
 models <- mget(model_names)
 
 models$m.null <- m.null
-models$m.global.d <- m.global.d
-models$m.global.l <- m.global.l
+models$m.global <- m.global
 
-model_names <- c(model_names, "m.null", "m.global.d", "m.global.l")
+model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
+
+# NEW RESULTS 2025-01-20 ####
+
 
 # ---------------------------------------------------------------------------- #
 
