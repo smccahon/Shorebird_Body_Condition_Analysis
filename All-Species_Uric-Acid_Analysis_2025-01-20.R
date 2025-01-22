@@ -1,7 +1,7 @@
 #-----------------------------------#
 #   All Species Uric Acid Analysis  #
 #           Created 01/20/2025      #          
-#         Modified 01/20/2025       #
+#         Modified 01/22/2025       #
 #-----------------------------------#
 
 # load packages
@@ -715,15 +715,124 @@ aictab(models, modnames = model_names)
 # Top model summaries ####
 summary(m61)
 confint(m61) # time and date * migstatus are significant
+plot(m61)
+# heterogeneity issues
 
 summary(m116)
 confint(m116) # date * migstatus is significant
+plot(m116)
+# heterogeneity issues
 
 summary(m117)
 confint(m117) # time and date * migstatus are significant
+plot(m117) # heterogeneity issues
 
 # ---------------------------------------------------------------------------- #
 
 # No effect of detection or ag intensity on uric acid levels
 
+# Model Assumptions ####
+hist(birds$Uric) # normally distributed data, no errors
 
+# Set up the 2x2 plot layout
+op <- par(mfrow = c(2, 2), mar = c(5, 4, 1, 2))
+
+# Plot residuals vs fitted values (CLEAR VIOLATION)
+fitted_vals <- fitted(m61)  # Get fitted values from the model
+residuals_vals <- resid(m61)  # Get residuals from the model
+plot(fitted_vals, residuals_vals, xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red")  # Add a horizontal line at zero for reference
+
+# Plot histogram of residuals (satisfied)
+hist(residuals_vals, xlab = "Residuals", main = "")
+
+# Plot residuals vs MigStatus (no violation)
+boxplot(residuals_vals ~ birds.cs$MigStatus, xlab = "MigStatus", ylab = "Residuals")
+
+# Plot residuals vs Capture Time (no violation)
+plot(birds.cs$ts.sunrise, residuals_vals, xlab = "Capture Time", ylab = "Residuals")
+
+# Plot residuals vs Date (no violation)
+plot(birds.cs$DaysIntoSeason_S, residuals_vals, xlab = "Date", ylab = "Residuals")
+
+# Restore original plot settings
+par(op)
+
+# VIOLATION IS PROBABLY BECAUSE A VARIABLE HAS A NONLINEAR RELATIONSHIP?
+
+# ---------------------------------------------------------------------------- #
+# Uric ~ MigStatus ####
+m <- lm(Uric ~ ts.sunrise + DaysIntoSeason_S * MigStatus, data = birds)
+
+d <- expand.grid(ts.sunrise = mean(birds$ts.sunrise),
+                 DaysIntoSeason_S = mean(birds$DaysIntoSeason_S),
+                 Detection = c("Non-detection"),
+                 MigStatus = c("Migratory", "Resident")) 
+
+predictions <- predict(m, newdata = d, se.fit = TRUE)
+
+d$predicted_Mass <- predictions$fit
+
+d$lower_CI <- d$predicted_Mass - 1.96 * predictions$se.fit
+d$upper_CI <- d$predicted_Mass + 1.96 * predictions$se.fit
+
+ggplot(d, aes(x = MigStatus, y = predicted_Mass)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
+                col = "black",
+                size = 1) +
+  theme_light() +
+  labs(x = "Migratory Status", 
+       y = "All Species Uric Acid Levels (umol)") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none",
+        strip.text = element_text(size = 18)) +
+  theme(legend.position = "none")
+
+
+
+# Uric ~ Time ####
+m <- lm(Uric ~ ts.sunrise + DaysIntoSeason_S * MigStatus, data = birds)
+
+d <- expand.grid(ts.sunrise = seq(min(birds$ts.sunrise),
+                                  max(birds$ts.sunrise),
+                                  length = 1000),
+                 DaysIntoSeason_S = mean(birds$DaysIntoSeason_S),
+                 Detection = c("Non-detection"),
+                 MigStatus = c("Migratory", "Resident")) 
+
+predictions <- predict(m, newdata = d, se.fit = TRUE, re.form = NULL)
+
+d$predicted_Mass <- predictions$fit
+
+d$lower_CI <- d$predicted_Mass - 1.96 * predictions$se.fit
+d$upper_CI <- d$predicted_Mass + 1.96 * predictions$se.fit
+
+ggplot(d, aes(x = ts.sunrise, y = predicted_Mass)) + 
+  geom_line(aes(color = MigStatus), linewidth = 1, show.legend = FALSE) +  
+  theme_light() +
+  labs(x = "Time of Capture since Sunrise (min)",
+       y = "All Species Uric Acid Levels (umol)",
+       color = "Migratory Status") +
+  geom_ribbon(aes(ymin = lower_CI, ymax = upper_CI, fill = MigStatus),  
+              alpha = 0.25, color = NA, show.legend = FALSE) +
+  geom_point(data = birds, aes(x = ts.sunrise, y = Uric, color = MigStatus)) +
+  theme(axis.title.x = element_text(size = 19,
+                                    margin = margin(t = 13)),
+        axis.title.y = element_text(size = 19,
+                                    margin = margin(r = 13)),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 16),
+        legend.text = element_text(size = 12, face = "italic"), 
+        legend.title = element_text(size = 14, face = "bold", color = "black"),
+        legend.position = c(0.875, 0.875)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black", size = 1) +
+  annotate("text", x = 0, y = 1900, 
+           label = "Sunrise", angle = 90, 
+           vjust = -0.5, hjust = 0.5,
+           size = 6)

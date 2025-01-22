@@ -854,17 +854,19 @@ d <- expand.grid(
   Detection = unique(birds$Detection),
   Species = unique(birds$Species))
 
-d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs", 
-                                          "Pectoral Sandpiper", 
-                                          "Killdeer", 
-                                          "American Avocet", 
-                                          "Long-billed Dowitcher", 
-                                          "Willet", 
-                                          "Wilson's Phalarope", 
+d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs",
+                                          "Pectoral Sandpiper",
+                                          "Killdeer",
+                                          "American Avocet",
+                                          "Long-billed Dowitcher",
+                                          "Willet",
+                                          "Wilson's Phalarope",
                                           "Semipalmated Sandpiper",
                                           "Least Sandpiper"))
 
-predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+# use re.form = NA to ignore random effect clustering
+# use re.form = NULL to include random effect
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE, re.form = NA) 
 
 d$fit <- predictions$fit
 
@@ -877,7 +879,7 @@ ggplot(d, aes(x = Detection, y = fit)) +
                 col = "black",
                 size = 1) +  # Add confidence intervals
   theme_light() +
-  facet_wrap(~ Species) +
+   # facet_wrap(~ Species) +
   labs(x = NULL, 
        y = "Predicted Fattening Index") +
   theme(axis.title.x = element_text(size = 16,
@@ -945,38 +947,29 @@ ggplot(d, aes(x = AgCategory, y = fit)) +
 summary(m)
 r.squaredGLMM(m)
 
+# Fattening Index ~ PercentAg ####
+
 m <- lmer(PC1 ~ PercentAg + (1 | Species), data = birds, REML = FALSE)
 
 d <- expand.grid(
-  AgCategory = unique(birds$AgCategory),
+  PercentAg = seq(min(birds$PercentAg),
+                  max(birds$PercentAg),
+                  length = 1000),
   Species = unique(birds$Species))
 
-d$Species <- factor(d$Species, levels = c("Lesser Yellowlegs", 
-                                          "Pectoral Sandpiper", 
-                                          "Killdeer", 
-                                          "American Avocet", 
-                                          "Long-billed Dowitcher", 
-                                          "Willet", 
-                                          "Wilson's Phalarope", 
-                                          "Semipalmated Sandpiper",
-                                          "Least Sandpiper"))
-
-predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE) 
+predictions <- predict(m, newdata = d, type = "response", se.fit = TRUE, re.form = NA) 
 
 d$fit <- predictions$fit
 
 d$lower_CI <- predictions$fit - 1.96 * predictions$se.fit  # Lower CI
 d$upper_CI <- predictions$fit + 1.96 * predictions$se.fit  # Upper CI
 
-ggplot(d, aes(x = AgCategory, y = fit)) +
-  geom_point(size = 3) +  # Points showing predicted values
-  geom_errorbar(aes(ymin = lower_CI, ymax = upper_CI), width = 0.1,
-                col = "black",
-                size = 1) +  # Add confidence intervals
+ggplot(d, aes(x = PercentAg, y = fit)) +
+  geom_line(size = 1) +  # Points showing predicted values
+  geom_ribbon(aes(ymin = lower_CI, ymax = upper_CI), alpha = 0.2) +
   theme_light() +
-  facet_wrap(~ Species) +
-  labs(x = "Agricultural Intensity", 
-       y = "Predicted Fattening Index") +
+  labs(x = "Surrounding Crop Intensity (%)", 
+       y = "Predicted Fattening Index for All Species") +
   theme(axis.title.x = element_text(size = 16,
                                     margin = margin(t = 13)),
         axis.title.y = element_text(size = 16,

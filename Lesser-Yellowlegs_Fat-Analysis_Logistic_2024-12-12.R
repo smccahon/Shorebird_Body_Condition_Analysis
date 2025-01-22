@@ -211,10 +211,10 @@ aictab(models, modnames = model_names)
 # ---------------------------------------------------------------------------- #
 
 ## Single Models ####
+## Single Models ####
 
-m.global <- glm(Fat.G ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+m.global <- glm(Fat.G ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + Detection + PercentAg + Age, 
                data = leye.cs, family = "binomial")
-
 
 m.null <- glm(Fat.G ~ 1, data = leye.cs, family = "binomial")
 
@@ -224,79 +224,110 @@ m3 <- glm(Fat.G ~ DaysIntoSeason_S, data = leye.cs, family = "binomial")
 m4 <- glm(Fat.G ~ ts.sunrise, data = leye.cs, family = "binomial")
 m5 <- glm(Fat.G ~ PercentAg, data = leye.cs, family = "binomial")
 m6 <- glm(Fat.G ~ Detection, data = leye.cs, family = "binomial")
+m7 <- glm(Fat.G ~ Age, data = leye.cs, family = "binomial")
 
 ## Additive Models ####
 
 ### Two additive combinations ####
-m7 <- glm(Fat.G ~ Sex + Event, data = leye.cs, family = "binomial")
-m8 <- glm(Fat.G ~ Sex + DaysIntoSeason_S, data = leye.cs, family = "binomial")
-m9 <- glm(Fat.G ~ Sex + ts.sunrise, data = leye.cs, family = "binomial")
-m10 <- glm(Fat.G ~ Sex + PercentAg, data = leye.cs, family = "binomial")
-m11 <- glm(Fat.G ~ Sex + Detection, data = leye.cs, family = "binomial")
-m12 <- glm(Fat.G ~ Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
-m13 <- glm(Fat.G ~ Event * ts.sunrise, data = leye.cs, family = "binomial")
-m14 <- glm(Fat.G ~ Event + PercentAg, data = leye.cs, family = "binomial")
-m15 <- glm(Fat.G ~ Event + Detection, data = leye.cs, family = "binomial")
+m8 <- glm(Fat.G ~ Sex + Event, data = leye.cs, family = "binomial")
+m9 <- glm(Fat.G ~ Sex + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m10 <- glm(Fat.G ~ Sex + ts.sunrise, data = leye.cs, family = "binomial")
+m11 <- glm(Fat.G ~ Sex + PercentAg, data = leye.cs, family = "binomial")
+m12 <- glm(Fat.G ~ Sex + Detection, data = leye.cs, family = "binomial")
+m13 <- glm(Fat.G ~ Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m14 <- glm(Fat.G ~ Event * ts.sunrise, data = leye.cs, family = "binomial")
+m15 <- glm(Fat.G ~ Event + PercentAg, data = leye.cs, family = "binomial")
 m16 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
 m17 <- glm(Fat.G ~ DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
 m18 <- glm(Fat.G ~ DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
 m19 <- glm(Fat.G ~ ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
 m20 <- glm(Fat.G ~ ts.sunrise + Detection, data = leye.cs, family = "binomial")
 m21 <- glm(Fat.G ~ PercentAg + Detection, data = leye.cs, family = "binomial")
+m22 <- glm(Fat.G ~ Age + Event, data = leye.cs, family = "binomial")
+m23 <- glm(Fat.G ~ Age + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m24 <- glm(Fat.G ~ Age + ts.sunrise, data = leye.cs, family = "binomial")
+m25 <- glm(Fat.G ~ Age + PercentAg, data = leye.cs, family = "binomial")
+m26 <- glm(Fat.G ~ Age + Detection, data = leye.cs, family = "binomial")
 
 ### Three additive combinations ####
-m22 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
-m23 <- glm(Fat.G ~ Sex + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m24 <- glm(Fat.G ~ Sex + Event + PercentAg, data = leye.cs, family = "binomial")
-m25 <- glm(Fat.G ~ Sex + Event + Detection, data = leye.cs, family = "binomial")
-m26 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
-m27 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
-m28 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
-m29 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
-m30 <- glm(Fat.G ~ Sex + ts.sunrise + Detection, data = leye.cs, family = "binomial")
-m31 <- glm(Fat.G ~ Sex + PercentAg + Detection, data = leye.cs, family = "binomial")
-m32 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m33 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
-m34 <- glm(Fat.G ~ Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
-m35 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
-m36 <- glm(Fat.G ~ Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
-m37 <- glm(Fat.G ~ Event + PercentAg + Detection, data = leye.cs, family = "binomial")
-m38 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
-m39 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
-m40 <- glm(Fat.G ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
-m41 <- glm(Fat.G ~ ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m27 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m28 <- glm(Fat.G ~ Sex + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m29 <- glm(Fat.G ~ Sex + Event + PercentAg, data = leye.cs, family = "binomial")
+m30 <- glm(Fat.G ~ Sex + Event + Detection, data = leye.cs, family = "binomial")
+m31 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
+m32 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m33 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m34 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m35 <- glm(Fat.G ~ Sex + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m36 <- glm(Fat.G ~ Sex + PercentAg + Detection, data = leye.cs, family = "binomial")
+m37 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
+m38 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m39 <- glm(Fat.G ~ Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m40 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m41 <- glm(Fat.G ~ Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m42 <- glm(Fat.G ~ Event + PercentAg + Detection, data = leye.cs, family = "binomial")
+m43 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m44 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m45 <- glm(Fat.G ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m46 <- glm(Fat.G ~ ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m47 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S, data = leye.cs, family = "binomial")
+m48 <- glm(Fat.G ~ Age + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m49 <- glm(Fat.G ~ Age + Event + PercentAg, data = leye.cs, family = "binomial")
+m50 <- glm(Fat.G ~ Age + Event + Detection, data = leye.cs, family = "binomial")
+m51 <- glm(Fat.G ~ Age + DaysIntoSeason_S + ts.sunrise, data = leye.cs, family = "binomial")
+m52 <- glm(Fat.G ~ Age + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m53 <- glm(Fat.G ~ Age + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m54 <- glm(Fat.G ~ Age + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m55 <- glm(Fat.G ~ Age + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m56 <- glm(Fat.G ~ Age + PercentAg + Detection, data = leye.cs, family = "binomial")
 
 ### Four additive combinations ####
-m42 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m43 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
-m44 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
-m45 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
-m46 <- glm(Fat.G ~ Sex + Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
-m47 <- glm(Fat.G ~ Sex + Event + PercentAg + Detection, data = leye.cs, family = "binomial")
-m48 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
-m49 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
-m50 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
-m51 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
-m52 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m53 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m54 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
-m55 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
-m56 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m57 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m58 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m59 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m60 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m61 <- glm(Fat.G ~ Sex + Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m62 <- glm(Fat.G ~ Sex + Event + PercentAg + Detection, data = leye.cs, family = "binomial")
+m63 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m64 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m65 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m66 <- glm(Fat.G ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m67 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m68 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m69 <- glm(Fat.G ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m70 <- glm(Fat.G ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m71 <- glm(Fat.G ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m72 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m73 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + PercentAg, data = leye.cs, family = "binomial")
+m74 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + Detection, data = leye.cs, family = "binomial")
+m75 <- glm(Fat.G ~ Age + Event * ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m76 <- glm(Fat.G ~ Age + Event * ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m77 <- glm(Fat.G ~ Age + Event + PercentAg + Detection, data = leye.cs, family = "binomial")
+m78 <- glm(Fat.G ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs, family = "binomial")
+m79 <- glm(Fat.G ~ Age + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs, family = "binomial")
+m80 <- glm(Fat.G ~ Age + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m81 <- glm(Fat.G ~ Age + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
 
 ### Five additive combinations ####
 
-m57 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m58 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
-m59 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
-m60 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
-m61 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
-m62 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m82 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m83 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m84 <- glm(Fat.G ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m85 <- glm(Fat.G ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m86 <- glm(Fat.G ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m87 <- glm(Fat.G ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m88 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m89 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs, family = "binomial")
+m90 <- glm(Fat.G ~ Age + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs, family = "binomial")
+m91 <- glm(Fat.G ~ Age + Event * ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+m92 <- glm(Fat.G ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs, family = "binomial")
+
 
 # ---------------------------------------------------------------------------- #
 
 ### AIC Model Selection ####
 
-model_names <- paste0("m", 1:62)
+model_names <- paste0("m", 1:92)
 
 models <- mget(model_names)
 
@@ -318,7 +349,30 @@ confint(m7) # nothing significant
 confint(m42) # event*time significant
 confint(m16) # nothing significant
 
-# ---------------------------------------------------------------------------- #
+# NEW RESULTS AFTER INCLUDING AGE 2025-01-22 ####
+confint(m23) # juveniles have a higher probability of having less fat; date and fat are positively correlated
+summary(m23)
+
+ggplot(leye, aes(x = Age, fill = Fat.G)) + geom_bar(position = "dodge")
+
+confint(m72) # juveniles have a higher probability of having less fat; event * time significant
+summary(m72)
+
+confint(m47) # juveniles have a higher probability of having less fat;
+summary(m47)
+
+confint(m53) # juveniles have a higher probability of having less fat; date and fat are positively correlated
+summary(m53)
+
+confint(m14) # event *time significant
+confint(m28) # event * time significant
+confint(m48) # event * time significant
+confint(m51) # juveniles have a higher probability of having less fat; date and fat are positively correlated
+confint(m3) # date and fat are positively correlated
+confint(m22) # event significant
+confint(m2) 
+
+ # ---------------------------------------------------------------------------- #
 
 # Top Model Summaries ####
 

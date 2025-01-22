@@ -255,8 +255,8 @@ aictab(models, modnames = model_names)
 
 ## Single Models ####
 
-m.global <- lm(PecSizeBest ~ Sex + Event*ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
-                 data = leye.cs)
+m.global <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + DaysIntoSeason_S + Detection + PercentAg + Age, 
+               data = leye.cs)
 
 m.null <- lm(PecSizeBest ~ 1, data = leye.cs)
 
@@ -266,78 +266,109 @@ m3 <- lm(PecSizeBest ~ DaysIntoSeason_S, data = leye.cs)
 m4 <- lm(PecSizeBest ~ ts.sunrise, data = leye.cs)
 m5 <- lm(PecSizeBest ~ PercentAg, data = leye.cs)
 m6 <- lm(PecSizeBest ~ Detection, data = leye.cs)
+m7 <- lm(PecSizeBest ~ Age, data = leye.cs)
 
 ## Additive Models ####
 
 ### Two additive combinations ####
-m7 <- lm(PecSizeBest ~ Sex + Event, data = leye.cs)
-m8 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S, data = leye.cs)
-m9 <- lm(PecSizeBest ~ Sex + ts.sunrise, data = leye.cs)
-m10 <- lm(PecSizeBest ~ Sex + PercentAg, data = leye.cs)
-m11 <- lm(PecSizeBest ~ Sex + Detection, data = leye.cs)
-m12 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S, data = leye.cs)
-m13 <- lm(PecSizeBest ~ Event * ts.sunrise, data = leye.cs)
-m14 <- lm(PecSizeBest ~ Event + PercentAg, data = leye.cs)
-m15 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m16 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
-m17 <- lm(PecSizeBest ~ DaysIntoSeason_S + Detection, data = leye.cs)
-m18 <- lm(PecSizeBest ~ ts.sunrise + PercentAg, data = leye.cs)
-m19 <- lm(PecSizeBest ~ ts.sunrise + Detection, data = leye.cs)
-m20 <- lm(PecSizeBest ~ PercentAg + Detection, data = leye.cs)
+m8 <- lm(PecSizeBest ~ Sex + Event, data = leye.cs)
+m9 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m10 <- lm(PecSizeBest ~ Sex + ts.sunrise, data = leye.cs)
+m11 <- lm(PecSizeBest ~ Sex + PercentAg, data = leye.cs)
+m12 <- lm(PecSizeBest ~ Sex + Detection, data = leye.cs)
+m13 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S, data = leye.cs)
+m14 <- lm(PecSizeBest ~ Event * ts.sunrise, data = leye.cs)
+m15 <- lm(PecSizeBest ~ Event + PercentAg, data = leye.cs)
+m16 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m17 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m18 <- lm(PecSizeBest ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m19 <- lm(PecSizeBest ~ ts.sunrise + PercentAg, data = leye.cs)
+m20 <- lm(PecSizeBest ~ ts.sunrise + Detection, data = leye.cs)
+m21 <- lm(PecSizeBest ~ PercentAg + Detection, data = leye.cs)
+m22 <- lm(PecSizeBest ~ Age + Event, data = leye.cs)
+m23 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S, data = leye.cs)
+m24 <- lm(PecSizeBest ~ Age + ts.sunrise, data = leye.cs)
+m25 <- lm(PecSizeBest ~ Age + PercentAg, data = leye.cs)
+m26 <- lm(PecSizeBest ~ Age + Detection, data = leye.cs)
 
 ### Three additive combinations ####
-m21 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
-m22 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise, data = leye.cs)
-m23 <- lm(PecSizeBest ~ Sex + Event + PercentAg, data = leye.cs)
-m24 <- lm(PecSizeBest ~ Sex + Event + Detection, data = leye.cs)
-m25 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m26 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m27 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
-m28 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
-m29 <- lm(PecSizeBest ~ Sex + ts.sunrise + Detection, data = leye.cs)
-m30 <- lm(PecSizeBest ~ Sex + PercentAg + Detection, data = leye.cs)
-m31 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs)
-m32 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m33 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m34 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg, data = leye.cs)
-m35 <- lm(PecSizeBest ~ Event * ts.sunrise + Detection, data = leye.cs)
-m36 <- lm(PecSizeBest ~ Event + PercentAg + Detection, data = leye.cs)
-m37 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m38 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m39 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m40 <- lm(PecSizeBest ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m27 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m28 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise, data = leye.cs)
+m29 <- lm(PecSizeBest ~ Sex + Event + PercentAg, data = leye.cs)
+m30 <- lm(PecSizeBest ~ Sex + Event + Detection, data = leye.cs)
+m31 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(PecSizeBest ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(PecSizeBest ~ Sex + PercentAg + Detection, data = leye.cs)
+m37 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m38 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m39 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m40 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg, data = leye.cs)
+m41 <- lm(PecSizeBest ~ Event * ts.sunrise + Detection, data = leye.cs)
+m42 <- lm(PecSizeBest ~ Event + PercentAg + Detection, data = leye.cs)
+m43 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m44 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m45 <- lm(PecSizeBest ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m46 <- lm(PecSizeBest ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m47 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S, data = leye.cs)
+m48 <- lm(PecSizeBest ~ Age + Event * ts.sunrise, data = leye.cs)
+m49 <- lm(PecSizeBest ~ Age + Event + PercentAg, data = leye.cs)
+m50 <- lm(PecSizeBest ~ Age + Event + Detection, data = leye.cs)
+m51 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m52 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m53 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + Detection, data = leye.cs)
+m54 <- lm(PecSizeBest ~ Age + ts.sunrise + PercentAg, data = leye.cs)
+m55 <- lm(PecSizeBest ~ Age + ts.sunrise + Detection, data = leye.cs)
+m56 <- lm(PecSizeBest ~ Age + PercentAg + Detection, data = leye.cs)
 
 ### Four additive combinations ####
-m41 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event*ts.sunrise, data = leye.cs)
-m42 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m43 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m44 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs)
-m45 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
-m46 <- lm(PecSizeBest ~ Sex + Event + PercentAg + Detection, data = leye.cs)
-m47 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m48 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m49 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m50 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m51 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event*ts.sunrise, data = leye.cs)
-m52 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event*ts.sunrise, data = leye.cs)
-m53 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m54 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
-m55 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m57 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m58 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m59 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m60 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg, data = leye.cs)
+m61 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + Detection, data = leye.cs)
+m62 <- lm(PecSizeBest ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m63 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m64 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m65 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m66 <- lm(PecSizeBest ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m67 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
+m68 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m69 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m70 <- lm(PecSizeBest ~ Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m71 <- lm(PecSizeBest ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m72 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Event * ts.sunrise, data = leye.cs)
+m73 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m74 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m75 <- lm(PecSizeBest ~ Age + Event * ts.sunrise + PercentAg, data = leye.cs)
+m76 <- lm(PecSizeBest ~ Age + Event * ts.sunrise + Detection, data = leye.cs)
+m77 <- lm(PecSizeBest ~ Age + Event + PercentAg + Detection, data = leye.cs)
+m78 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m79 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m80 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m81 <- lm(PecSizeBest ~ Age + ts.sunrise + PercentAg + Detection, data = leye.cs)
 
 ### Five additive combinations ####
 
-m56 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
-m57 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
-m58 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m59 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
-m60 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m61 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event*ts.sunrise, data = leye.cs)
+m82 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
+m83 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m84 <- lm(PecSizeBest ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m85 <- lm(PecSizeBest ~ Sex + Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m86 <- lm(PecSizeBest ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m87 <- lm(PecSizeBest ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection + Event * ts.sunrise, data = leye.cs)
+m88 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Event * ts.sunrise, data = leye.cs)
+m89 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Detection + Event * ts.sunrise, data = leye.cs)
+m90 <- lm(PecSizeBest ~ Age + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m91 <- lm(PecSizeBest ~ Age + Event * ts.sunrise + PercentAg + Detection, data = leye.cs)
+m92 <- lm(PecSizeBest ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
 
 # ---------------------------------------------------------------------------- #
 
 ### AIC Model Selection ####
 
-model_names <- paste0("m", 1:61)
+model_names <- paste0("m", 1:92)
 
 models <- mget(model_names)
 
@@ -354,6 +385,23 @@ summary(m20)
 confint(m40) # detection and percent ag significant
 confint(m5) # percent ag significant
 confint(m6) # detection significant
+
+# NEW RESULTS INCLUDING AGE 2025-01-22 ####
+confint(m25) # juveniles have smaller pectoral muscles; percent ag significant (-)
+summary(m25)
+
+ggplot(leye, aes(x = Age, y = PecSizeBest)) + geom_boxplot()
+
+confint(m21) # detection (+) and percentag significant (-)
+
+ggplot(leye, aes(x = Detection, y = PecSizeBest)) + geom_boxplot()
+
+confint(m56) # nothing significant
+
+confint(m54) # juveniles have smaller pectoral muscles; percent ag significant (-)
+summary(m54)
+
+confint(m46) # detection (+) and percentag significant (-)
 
 # ---------------------------------------------------------------------------- #
 
@@ -644,12 +692,22 @@ d <- cbind(d, predict(m, newdata = d, interval = "confidence"))
 ggplot(d, aes(x = PercentAg, y = fit)) + 
   geom_line(aes(color = "tan2"), size = 1, show.legend = FALSE) +  
   theme_light() +
-  labs(x = "Surrounding Agricultural Intensity (%)",
-       y = expression("Lesser Yellowlegs Breast Muscle Size" ~~~ (mm[score]))) +
+  labs(x = "Surrounding Cropland Use (%)",
+       y = expression("Pectoral Muscle Size" ~~~ (mm[score]))) +
   geom_ribbon(aes(ymin = lwr, ymax = upr),  
               alpha = 0.25, color = NA, show.legend = FALSE,
               fill = "tan1") +
-  geom_point(data = leye, aes(x = PercentAg, y = PecSizeBest), color = "tan2")
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 13)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 13)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  geom_point(data = leye, aes(x = PercentAg, y = PecSizeBest), color = "tan2") +
+  scale_x_continuous(
+    breaks = seq(0, 100, by = 10))
+  
 
 # Pectoral ~ Agricultural Intensity
 m <- lm(PecSizeBest ~ PercentAg, data = leye)

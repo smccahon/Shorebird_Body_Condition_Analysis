@@ -1,7 +1,7 @@
 #-----------------------------------------#
 #   Lesser Yellowlegs Uric Acid Analysis  #
 #          Created 01/20/2025             #          
-#         Modified 01/20/2025             #
+#         Modified 01/22/2025             #
 #-----------------------------------------#
 
 # load packages
@@ -194,8 +194,7 @@ aictab(models, modnames = model_names)
 
 
 ## Single Models ####
-
-m.global <- lm(Uric ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+m.global <- lm(Uric ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg + Age, 
                data = leye.cs)
 
 m.null <- lm(Uric ~ 1, data = leye.cs)
@@ -206,78 +205,110 @@ m3 <- lm(Uric ~ DaysIntoSeason_S, data = leye.cs)
 m4 <- lm(Uric ~ ts.sunrise, data = leye.cs)
 m5 <- lm(Uric ~ PercentAg, data = leye.cs)
 m6 <- lm(Uric ~ Detection, data = leye.cs)
+m7 <- lm(Uric ~ Age, data = leye.cs)
 
 ## Additive Models ####
 
 ### Two additive combinations ####
-m7 <- lm(Uric ~ Sex + Event, data = leye.cs)
-m8 <- lm(Uric ~ Sex + DaysIntoSeason_S, data = leye.cs)
-m9 <- lm(Uric ~ Sex + ts.sunrise, data = leye.cs)
-m10 <- lm(Uric ~ Sex + PercentAg, data = leye.cs)
-m11 <- lm(Uric ~ Sex + Detection, data = leye.cs)
-m12 <- lm(Uric ~ Event + DaysIntoSeason_S, data = leye.cs)
-m13 <- lm(Uric ~ Event + ts.sunrise, data = leye.cs)
-m14 <- lm(Uric ~ Event + PercentAg, data = leye.cs)
-m15 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m16 <- lm(Uric ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
-m17 <- lm(Uric ~ DaysIntoSeason_S + Detection, data = leye.cs)
-m18 <- lm(Uric ~ ts.sunrise + PercentAg, data = leye.cs)
-m19 <- lm(Uric ~ ts.sunrise + Detection, data = leye.cs)
-m20 <- lm(Uric ~ PercentAg + Detection, data = leye.cs)
+m8 <- lm(Uric ~ Sex + Event, data = leye.cs)
+m9 <- lm(Uric ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m10 <- lm(Uric ~ Sex + ts.sunrise, data = leye.cs)
+m11 <- lm(Uric ~ Sex + PercentAg, data = leye.cs)
+m12 <- lm(Uric ~ Sex + Detection, data = leye.cs)
+m13 <- lm(Uric ~ Event + DaysIntoSeason_S, data = leye.cs)
+m14 <- lm(Uric ~ Event + ts.sunrise, data = leye.cs)
+m15 <- lm(Uric ~ Event + PercentAg, data = leye.cs)
+m16 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m17 <- lm(Uric ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m18 <- lm(Uric ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m19 <- lm(Uric ~ ts.sunrise + PercentAg, data = leye.cs)
+m20 <- lm(Uric ~ ts.sunrise + Detection, data = leye.cs)
+m21 <- lm(Uric ~ PercentAg + Detection, data = leye.cs)
+m22 <- lm(Uric ~ Age + Event, data = leye.cs)
+m23 <- lm(Uric ~ Age + DaysIntoSeason_S, data = leye.cs)
+m24 <- lm(Uric ~ Age + ts.sunrise, data = leye.cs)
+m25 <- lm(Uric ~ Age + PercentAg, data = leye.cs)
+m26 <- lm(Uric ~ Age + Detection, data = leye.cs)
 
 ### Three additive combinations ####
-m21 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
-m22 <- lm(Uric ~ Sex + Event + ts.sunrise, data = leye.cs)
-m23 <- lm(Uric ~ Sex + Event + PercentAg, data = leye.cs)
-m24 <- lm(Uric ~ Sex + Event + Detection, data = leye.cs)
-m25 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m26 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m27 <- lm(Uric ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
-m28 <- lm(Uric ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
-m29 <- lm(Uric ~ Sex + ts.sunrise + Detection, data = leye.cs)
-m30 <- lm(Uric ~ Sex + PercentAg + Detection, data = leye.cs)
-m31 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m32 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m33 <- lm(Uric ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m34 <- lm(Uric ~ Event + ts.sunrise + PercentAg, data = leye.cs)
-m35 <- lm(Uric ~ Event + ts.sunrise + Detection, data = leye.cs)
-m36 <- lm(Uric ~ Event + PercentAg + Detection, data = leye.cs)
-m37 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m38 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m39 <- lm(Uric ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m40 <- lm(Uric ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m27 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m28 <- lm(Uric ~ Sex + Event + ts.sunrise, data = leye.cs)
+m29 <- lm(Uric ~ Sex + Event + PercentAg, data = leye.cs)
+m30 <- lm(Uric ~ Sex + Event + Detection, data = leye.cs)
+m31 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(Uric ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(Uric ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(Uric ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(Uric ~ Sex + PercentAg + Detection, data = leye.cs)
+m37 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m38 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m39 <- lm(Uric ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m40 <- lm(Uric ~ Event + ts.sunrise + PercentAg, data = leye.cs)
+m41 <- lm(Uric ~ Event + ts.sunrise + Detection, data = leye.cs)
+m42 <- lm(Uric ~ Event + PercentAg + Detection, data = leye.cs)
+m43 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m44 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m45 <- lm(Uric ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m46 <- lm(Uric ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m47 <- lm(Uric ~ Age + Event + DaysIntoSeason_S, data = leye.cs)
+m48 <- lm(Uric ~ Age + Event + ts.sunrise, data = leye.cs)
+m49 <- lm(Uric ~ Age + Event + PercentAg, data = leye.cs)
+m50 <- lm(Uric ~ Age + Event + Detection, data = leye.cs)
+m51 <- lm(Uric ~ Age + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m52 <- lm(Uric ~ Age + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m53 <- lm(Uric ~ Age + DaysIntoSeason_S + Detection, data = leye.cs)
+m54 <- lm(Uric ~ Age + ts.sunrise + PercentAg, data = leye.cs)
+m55 <- lm(Uric ~ Age + ts.sunrise + Detection, data = leye.cs)
+m56 <- lm(Uric ~ Age + PercentAg + Detection, data = leye.cs)
 
 ### Four additive combinations ####
-m41 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m42 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m43 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m44 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
-m45 <- lm(Uric ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
-m46 <- lm(Uric ~ Sex + Event + PercentAg + Detection, data = leye.cs)
-m47 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m48 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m49 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m50 <- lm(Uric ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m51 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m52 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m53 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m54 <- lm(Uric ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m55 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m57 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m58 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m59 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m60 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
+m61 <- lm(Uric ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
+m62 <- lm(Uric ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m63 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m64 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m65 <- lm(Uric ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m66 <- lm(Uric ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m67 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m68 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m69 <- lm(Uric ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m70 <- lm(Uric ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m71 <- lm(Uric ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m72 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m73 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m74 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m75 <- lm(Uric ~ Age + Event + ts.sunrise + PercentAg, data = leye.cs)
+m76 <- lm(Uric ~ Age + Event + ts.sunrise + Detection, data = leye.cs)
+m77 <- lm(Uric ~ Age + Event + PercentAg + Detection, data = leye.cs)
+m78 <- lm(Uric ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m79 <- lm(Uric ~ Age + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m80 <- lm(Uric ~ Age + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m81 <- lm(Uric ~ Age + ts.sunrise + PercentAg + Detection, data = leye.cs)
 
 ### Five additive combinations ####
 
-m56 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m57 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m58 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m59 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m60 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m61 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m82 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m83 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m84 <- lm(Uric ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m85 <- lm(Uric ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m86 <- lm(Uric ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m87 <- lm(Uric ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m88 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m89 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m90 <- lm(Uric ~ Age + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m91 <- lm(Uric ~ Age + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m92 <- lm(Uric ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+
 
 # ---------------------------------------------------------------------------- #
 
 ### AIC Model Selection ####
 
-model_names <- paste0("m", 1:61)
+model_names <- paste0("m", 1:92)
 
 models <- mget(model_names)
 
@@ -287,6 +318,12 @@ models$m.global <- m.global
 model_names <- c(model_names, "m.null", "m.global")
 
 aictab(models, modnames = model_names)
+
+# NEW RESULTS AFTER INCORPORATING AGE 2025-01-22 ####
+
+confint(m4) # time has a significant effect
+confint(m24) # time has a significant effect
+confint(m14) # time has a significant effect
 
 # ---------------------------------------------------------------------------- #
 

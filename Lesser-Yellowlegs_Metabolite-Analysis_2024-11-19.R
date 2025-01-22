@@ -1,7 +1,7 @@
 #-----------------------------------------#
 #  Lesser Yellowlegs Metabolite Analysis  #
 #          Created 11/20/2024             #          
-#         Modified 01/20/2025             #
+#         Modified 01/22/2025             #
 #-----------------------------------------#
 
 # load packages
@@ -291,7 +291,7 @@ aictab(models, modnames = model_names)
 
 ## Single Models ####
 
-m.global <- lm(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg, 
+m.global <- lm(PC1 ~ Sex + Event + ts.sunrise + DaysIntoSeason_S + Detection + PercentAg + Age, 
                data = leye.cs)
 
 m.null <- lm(PC1 ~ 1, data = leye.cs)
@@ -302,78 +302,109 @@ m3 <- lm(PC1 ~ DaysIntoSeason_S, data = leye.cs)
 m4 <- lm(PC1 ~ ts.sunrise, data = leye.cs)
 m5 <- lm(PC1 ~ PercentAg, data = leye.cs)
 m6 <- lm(PC1 ~ Detection, data = leye.cs)
+m7 <- lm(PC1 ~ Age, data = leye.cs)
 
 ## Additive Models ####
 
 ### Two additive combinations ####
-m7 <- lm(PC1 ~ Sex + Event, data = leye.cs)
-m8 <- lm(PC1 ~ Sex + DaysIntoSeason_S, data = leye.cs)
-m9 <- lm(PC1 ~ Sex + ts.sunrise, data = leye.cs)
-m10 <- lm(PC1 ~ Sex + PercentAg, data = leye.cs)
-m11 <- lm(PC1 ~ Sex + Detection, data = leye.cs)
-m12 <- lm(PC1 ~ Event + DaysIntoSeason_S, data = leye.cs)
-m13 <- lm(PC1 ~ Event + ts.sunrise, data = leye.cs)
-m14 <- lm(PC1 ~ Event + PercentAg, data = leye.cs)
-m15 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m16 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
-m17 <- lm(PC1 ~ DaysIntoSeason_S + Detection, data = leye.cs)
-m18 <- lm(PC1 ~ ts.sunrise + PercentAg, data = leye.cs)
-m19 <- lm(PC1 ~ ts.sunrise + Detection, data = leye.cs)
-m20 <- lm(PC1 ~ PercentAg + Detection, data = leye.cs)
+m8 <- lm(PC1 ~ Sex + Event, data = leye.cs)
+m9 <- lm(PC1 ~ Sex + DaysIntoSeason_S, data = leye.cs)
+m10 <- lm(PC1 ~ Sex + ts.sunrise, data = leye.cs)
+m11 <- lm(PC1 ~ Sex + PercentAg, data = leye.cs)
+m12 <- lm(PC1 ~ Sex + Detection, data = leye.cs)
+m13 <- lm(PC1 ~ Event + DaysIntoSeason_S, data = leye.cs)
+m14 <- lm(PC1 ~ Event + ts.sunrise, data = leye.cs)
+m15 <- lm(PC1 ~ Event + PercentAg, data = leye.cs)
+m16 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m17 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg, data = leye.cs)
+m18 <- lm(PC1 ~ DaysIntoSeason_S + Detection, data = leye.cs)
+m19 <- lm(PC1 ~ ts.sunrise + PercentAg, data = leye.cs)
+m20 <- lm(PC1 ~ ts.sunrise + Detection, data = leye.cs)
+m21 <- lm(PC1 ~ PercentAg + Detection, data = leye.cs)
+m22 <- lm(PC1 ~ Age + Event, data = leye.cs)
+m23 <- lm(PC1 ~ Age + DaysIntoSeason_S, data = leye.cs)
+m24 <- lm(PC1 ~ Age + ts.sunrise, data = leye.cs)
+m25 <- lm(PC1 ~ Age + PercentAg, data = leye.cs)
+m26 <- lm(PC1 ~ Age + Detection, data = leye.cs)
 
 ### Three additive combinations ####
-m21 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
-m22 <- lm(PC1 ~ Sex + Event + ts.sunrise, data = leye.cs)
-m23 <- lm(PC1 ~ Sex + Event + PercentAg, data = leye.cs)
-m24 <- lm(PC1 ~ Sex + Event + Detection, data = leye.cs)
-m25 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m26 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m27 <- lm(PC1 ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
-m28 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
-m29 <- lm(PC1 ~ Sex + ts.sunrise + Detection, data = leye.cs)
-m30 <- lm(PC1 ~ Sex + PercentAg + Detection, data = leye.cs)
-m31 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m32 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m33 <- lm(PC1 ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m34 <- lm(PC1 ~ Event + ts.sunrise + PercentAg, data = leye.cs)
-m35 <- lm(PC1 ~ Event + ts.sunrise + Detection, data = leye.cs)
-m36 <- lm(PC1 ~ Event + PercentAg + Detection, data = leye.cs)
-m37 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m38 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m39 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m40 <- lm(PC1 ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m27 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S, data = leye.cs)
+m28 <- lm(PC1 ~ Sex + Event + ts.sunrise, data = leye.cs)
+m29 <- lm(PC1 ~ Sex + Event + PercentAg, data = leye.cs)
+m30 <- lm(PC1 ~ Sex + Event + Detection, data = leye.cs)
+m31 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m32 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m33 <- lm(PC1 ~ Sex + DaysIntoSeason_S + Detection, data = leye.cs)
+m34 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg, data = leye.cs)
+m35 <- lm(PC1 ~ Sex + ts.sunrise + Detection, data = leye.cs)
+m36 <- lm(PC1 ~ Sex + PercentAg + Detection, data = leye.cs)
+m37 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m38 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m39 <- lm(PC1 ~ Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m40 <- lm(PC1 ~ Event + ts.sunrise + PercentAg, data = leye.cs)
+m41 <- lm(PC1 ~ Event + ts.sunrise + Detection, data = leye.cs)
+m42 <- lm(PC1 ~ Event + PercentAg + Detection, data = leye.cs)
+m43 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m44 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m45 <- lm(PC1 ~ DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m46 <- lm(PC1 ~ ts.sunrise + PercentAg + Detection, data = leye.cs)
+m47 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S, data = leye.cs)
+m48 <- lm(PC1 ~ Age + Event + ts.sunrise, data = leye.cs)
+m49 <- lm(PC1 ~ Age + Event + PercentAg, data = leye.cs)
+m50 <- lm(PC1 ~ Age + Event + Detection, data = leye.cs)
+m51 <- lm(PC1 ~ Age + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m52 <- lm(PC1 ~ Age + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m53 <- lm(PC1 ~ Age + DaysIntoSeason_S + Detection, data = leye.cs)
+m54 <- lm(PC1 ~ Age + ts.sunrise + PercentAg, data = leye.cs)
+m55 <- lm(PC1 ~ Age + ts.sunrise + Detection, data = leye.cs)
+m56 <- lm(PC1 ~ Age + PercentAg + Detection, data = leye.cs)
 
 ### Four additive combinations ####
-m41 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
-m42 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
-m43 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
-m44 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
-m45 <- lm(PC1 ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
-m46 <- lm(PC1 ~ Sex + Event + PercentAg + Detection, data = leye.cs)
-m47 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m48 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m49 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m50 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m51 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m52 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m53 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m54 <- lm(PC1 ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m55 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m57 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m58 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m59 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m60 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg, data = leye.cs)
+m61 <- lm(PC1 ~ Sex + Event + ts.sunrise + Detection, data = leye.cs)
+m62 <- lm(PC1 ~ Sex + Event + PercentAg + Detection, data = leye.cs)
+m63 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m64 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m65 <- lm(PC1 ~ Sex + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m66 <- lm(PC1 ~ Sex + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m67 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m68 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m69 <- lm(PC1 ~ Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m70 <- lm(PC1 ~ Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m71 <- lm(PC1 ~ DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m72 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + ts.sunrise, data = leye.cs)
+m73 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + PercentAg, data = leye.cs)
+m74 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + Detection, data = leye.cs)
+m75 <- lm(PC1 ~ Age + Event + ts.sunrise + PercentAg, data = leye.cs)
+m76 <- lm(PC1 ~ Age + Event + ts.sunrise + Detection, data = leye.cs)
+m77 <- lm(PC1 ~ Age + Event + PercentAg + Detection, data = leye.cs)
+m78 <- lm(PC1 ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m79 <- lm(PC1 ~ Age + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m80 <- lm(PC1 ~ Age + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m81 <- lm(PC1 ~ Age + ts.sunrise + PercentAg + Detection, data = leye.cs)
 
 ### Five additive combinations ####
 
-m56 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
-m57 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
-m58 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
-m59 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m60 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
-m61 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m82 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m83 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m84 <- lm(PC1 ~ Sex + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m85 <- lm(PC1 ~ Sex + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m86 <- lm(PC1 ~ Sex + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m87 <- lm(PC1 ~ Event + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m88 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + ts.sunrise + PercentAg, data = leye.cs)
+m89 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + ts.sunrise + Detection, data = leye.cs)
+m90 <- lm(PC1 ~ Age + Event + DaysIntoSeason_S + PercentAg + Detection, data = leye.cs)
+m91 <- lm(PC1 ~ Age + Event + ts.sunrise + PercentAg + Detection, data = leye.cs)
+m92 <- lm(PC1 ~ Age + DaysIntoSeason_S + ts.sunrise + PercentAg + Detection, data = leye.cs)
 
 # ---------------------------------------------------------------------------- #
 
 ### AIC Model Selection ####
 
-model_names <- paste0("m", 1:61)
+model_names <- paste0("m", 1:92)
 
 models <- mget(model_names)
 
@@ -388,6 +419,12 @@ aictab(models, modnames = model_names)
 confint(m18) # time and ag significant (negative)...
 confint(m37) # time and ag significant (negative)...
 confint(m28) # time and ag significant (negative)...
+
+# NEW SUMMARIES 2025-01-22 ####
+confint(m19) # time and ag significant (negative)...
+confint(m43) # time and ag significant (negative)...
+confint(m34) # time and ag significant (negative)...
+confint(m46) # time and ag significant (negative)...
 
 # ---------------------------------------------------------------------------- #
 
@@ -719,5 +756,57 @@ ggplot(d, aes(x = (PercentAg * 100), y = predicted_Mass)) +
              color = "red", size = 1)
 
 summary(m)
+
+# ---------------------------------------------------------------------------- #
+
+# Age in different ag ####
+
+leye$Age <- factor(leye$Age, levels = c("Juvenile", "Adult"))
+
+ggplot(leye, aes(x = Age, y = PercentAg)) +
+  geom_boxplot() +
+  theme_light() +
+  labs(y = "% Agriculture Surrounding Wetland", 
+       x = "Age") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none")
+
+# Refueling rates of juveniles versus adults ####
+ggplot(leye, aes(x = Age, y = PC1)) +
+  geom_boxplot() +
+  theme_light() +
+  labs(y = "Lesser Yellowlegs Fattening Index", 
+       x = "Age") +
+  theme(axis.title.x = element_text(size = 21,
+                                    margin = margin(t = 12)),
+        axis.title.y = element_text(size = 21,
+                                    margin = margin(r = 12)),
+        axis.text.x = element_text(size = 18),
+        axis.text.y = element_text(size = 18),
+        legend.position = "none") +
+  theme(legend.position = "none") +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = "red", size = 1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
